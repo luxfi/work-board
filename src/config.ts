@@ -1,23 +1,26 @@
-import type { Address } from 'viem';
+import { resolveBrand, resolveBrandKey } from './brands';
 
-// The one place chain / addresses / RPC live.
+// The one place chain / addresses / RPC live. Brand-varying values come from the
+// brand map (src/brands.ts), selected by the VITE_BRAND build-arg (default zoo).
 
-export const CHAIN_ID = 200200;
-export const CHAIN_NAME = 'Zoo';
-export const NATIVE_SYMBOL = 'ZOO';
+const BRAND = resolveBrand(import.meta.env.VITE_BRAND);
+
+export const BRAND_KEY = resolveBrandKey(import.meta.env.VITE_BRAND);
+
+export const CHAIN_ID = BRAND.chainId;
+export const CHAIN_NAME = BRAND.chainName;
+export const NATIVE_SYMBOL = BRAND.nativeSymbol;
 
 // Dev: '/rpc' is proxied by Vite to the port-forwarded node (see vite.config.ts).
-// Prod: build with VITE_RPC_URL=https://api.zoo.network/v1/bc/C/rpc
+// Prod: build bakes VITE_RPC_URL (docker.yml passes the brand's canonical RPC).
 export const RPC_URL: string = import.meta.env.VITE_RPC_URL ?? '/rpc';
 
-export const ADDRESSES = {
-  bounty: '0x3EDb4a0104614b4aC12D5babCE984291aE8BE8E7',
-  escrow: '0x095E68282aea751Cc70A2Be565270f1B6AB0229C',
-  reputation: '0xed976852e8c2b1283e4F475845046B679224460D',
-  owner: '0x229599f227231d8C90fcF1a78589F5DC4b7A6962',
-} as const satisfies Record<string, Address>;
+export const ADDRESSES = BRAND.addresses;
 
-export const OWNER_LABEL = 'Zoo DAO Safe';
+export const OWNER_LABEL = BRAND.ownerLabel;
+
+// Organisation name for the header, e.g. 'Zoo DAO' / 'Pars DAO'.
+export const ORG_NAME = BRAND.org;
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
