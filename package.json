@@ -1,0 +1,26 @@
+{
+  "name": "work-board",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Zoo DAO on-chain bounty kanban — reads the live BountyV1/EscrowV1/ReputationV1 work-market over JSON-RPC.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "viem": "^2.55.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.1.5"
+  }
+}

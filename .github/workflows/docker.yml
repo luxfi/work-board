@@ -1,0 +1,24 @@
+name: Docker
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, dev, test]
+    tags: ['v*']
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  docker:
+    uses: hanzoai/.github/.github/workflows/docker-build.yml@main
+    with:
+      image: ghcr.io/luxfi/work-board
+      # Bake the live, CORS-enabled Zoo RPC into the static bundle at build time.
+      # The board reads the on-chain work-market directly from this URL.
+      build-args: |
+        VITE_RPC_URL=https://api.zoo.network/v1/bc/C/rpc
+      runner-amd64: '["self-hosted","linux","amd64"]'
+      runner-arm64: '["self-hosted","linux","arm64"]'
+      runner-deploy: '["self-hosted","linux","amd64"]'
+    secrets: inherit
