@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ADDRESSES, CHAIN_ID, OWNER_LABEL, REFRESH_MS } from './config';
+import { ADDRESSES, CHAIN_ID, ORG_NAME, OWNER_LABEL, REFRESH_MS } from './config';
 import { COLUMNS, State } from './types';
 import { short, tokenLabel } from './format';
 import { useBounties, type Source } from './useBounties';
@@ -25,7 +25,7 @@ function Header() {
     <header className="px-5 pt-5 pb-4 border-b border-neutral-800">
       <div className="flex items-baseline gap-x-3 gap-y-1 flex-wrap">
         <h1 className="text-lg font-semibold tracking-tight text-neutral-100">
-          Zoo DAO <span className="text-neutral-500 font-normal">— Work Board</span>
+          {ORG_NAME} <span className="text-neutral-500 font-normal">— Work Board</span>
         </h1>
         <span className="text-xs text-neutral-500">
           chain {CHAIN_ID}

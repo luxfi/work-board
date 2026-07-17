@@ -11,7 +11,7 @@ function resolveUrl(u: string): string {
 
 const rpc = resolveUrl(RPC_URL);
 
-export const zooChain = defineChain({
+export const appChain = defineChain({
   id: CHAIN_ID,
   name: CHAIN_NAME,
   nativeCurrency: { name: CHAIN_NAME, symbol: NATIVE_SYMBOL, decimals: 18 },
@@ -19,7 +19,7 @@ export const zooChain = defineChain({
 });
 
 const client = createPublicClient({
-  chain: zooChain,
+  chain: appChain,
   transport: http(rpc, { batch: true }),
 });
 

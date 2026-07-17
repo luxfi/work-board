@@ -1,0 +1,32 @@
+# Traefik (hanzoai/ingress) dynamic-config route for work.pars.network.
+#
+# The pars-k8s cluster routes every public host via Traefik's @file provider —
+# ConfigMap hanzo/pars-dynamic mounted at /etc/traefik/dynamic — NOT via
+# Kubernetes Ingress objects. api.pars.network and pars.vote are served exactly
+# this way. TLS is auto-issued by Traefik's built-in ACME resolver
+# (certResolver: letsencrypt), so no cert-manager Certificate/secret is involved.
+#
+# Apply by merging this fragment into the pars-dynamic ConfigMap's routes.yaml
+# (leaving the existing api./rpc./kms./pars.vote/vote./safe./status. routes
+# untouched):
+#   CM=pars-dynamic; NS=hanzo
+#   kubectl --context do-sfo3-pars-k8s -n $NS get cm $CM -o jsonpath='{.data.routes\.yaml}' > /tmp/routes.yaml
+#   # merge the router + service below, then:
+#   kubectl --context do-sfo3-pars-k8s -n $NS patch cm $CM --type merge \
+#     -p "$(jq -n --rawfile r /tmp/merged.yaml '{data:{"routes.yaml":$r}}')"
+# Traefik (--providers.file.watch=true) hot-reloads within ~60s and issues the cert.
+http:
+  routers:
+    work-pars-network:
+      entryPoints:
+        - websecure
+      rule: Host(`work.pars.network`)
+      service: work-board
+      tls:
+        certResolver: letsencrypt
+  services:
+    work-board:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: http://work-board.pars.svc.cluster.local:80

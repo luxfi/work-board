@@ -4,12 +4,20 @@ name: Docker
 # GHCR. This is the same in-org self-hosted pattern proven green by
 # luxfi/node · luxfi/dex · luxfi/genesis.
 #
+# One Dockerfile, one workflow, one registry (ghcr.io/luxfi — the source org, so
+# images are never mixed into another org's namespace). The brand matrix stamps
+# each white-label from the same source via the VITE_BRAND build-arg:
+#   zoo  -> ghcr.io/luxfi/work-board:sha-<sha>   (work.zoo.network)
+#   pars -> ghcr.io/luxfi/work-board:pars-<sha>  (work.pars.network)
+# The zoo leg resolves exactly as before (VITE_BRAND defaults to zoo), so its
+# image is unchanged.
+#
 # NOTE: the org-canonical reusable `hanzoai/.github/.../docker-build.yml@main`
 # is NOT usable from luxfi: hanzoai/.github is a PRIVATE repo and both orgs are
 # on the free plan (no shared enterprise), so GitHub blocks the cross-org
-# `uses:` at parse time — every luxfi caller of it currently fails at 0s. This
-# workflow builds the identical image (multi-stage Dockerfile → GHCR) entirely
-# within the luxfi org, so it actually runs.
+# `uses:` at parse time. This workflow builds entirely within the luxfi org, so
+# it actually runs; ARC runner pools are org-scoped so a luxfi repo must use the
+# luxfi (lux-build-*) pool.
 
 on:
   workflow_dispatch:
@@ -23,10 +31,19 @@ permissions:
 jobs:
   build:
     # lux-build-amd64: in-cluster ARC scale-set (lux-k8s, amd64 DOKS, DinD).
-    # amd64-only — the zoo-k8s deploy target is amd64; a static SPA needs no arm64.
+    # amd64-only — the deploy targets (zoo-k8s, pars-k8s) are amd64; a static SPA
+    # needs no arm64.
     runs-on: lux-build-amd64
-    outputs:
-      tags: ${{ steps.meta.outputs.tags }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - brand: zoo
+            prefix: sha-
+            rpc: https://api.zoo.network/v1/bc/C/rpc
+          - brand: pars
+            prefix: pars-
+            rpc: https://api.pars.network/v1/bc/C/rpc
     steps:
       - uses: actions/checkout@v4
 
@@ -49,23 +66,24 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/luxfi/work-board
-          # Immutable sha-<sha7> per commit; never :latest / :main.
+          # Immutable per-commit tag, one per brand; never :latest / :main.
           flavor: |
             latest=false
           tags: |
-            type=sha,format=short,prefix=sha-
+            type=sha,format=short,prefix=${{ matrix.prefix }}
 
       - name: Build & push
-        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
           file: Dockerfile
           platforms: linux/amd64
           push: true
-          # Bake the live, CORS-enabled Zoo RPC into the bundle at build time.
+          # Select the white-label profile and bake the live, CORS-enabled brand
+          # RPC into the bundle at build time.
           build-args: |
-            VITE_RPC_URL=https://api.zoo.network/v1/bc/C/rpc
+            VITE_BRAND=${{ matrix.brand }}
+            VITE_RPC_URL=${{ matrix.rpc }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           provenance: false
