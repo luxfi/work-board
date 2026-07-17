@@ -25,7 +25,7 @@ spec:
           # Pinned to the immutable CI tag (ghcr.io/luxfi/work-board:pars-<sha>),
           # built by docker.yml's `pars` matrix leg (VITE_BRAND=pars). CI builds
           # every push to main; bump this to roll a new build.
-          image: ghcr.io/luxfi/work-board:pars-pending
+          image: ghcr.io/luxfi/work-board:pars-28b6bff
           ports:
             - containerPort: 3000
           resources:
