@@ -1,24 +1,71 @@
 name: Docker
+
+# Build the static board image on luxfi's in-cluster ARC pool and push it to
+# GHCR. This is the same in-org self-hosted pattern proven green by
+# luxfi/node · luxfi/dex · luxfi/genesis.
+#
+# NOTE: the org-canonical reusable `hanzoai/.github/.../docker-build.yml@main`
+# is NOT usable from luxfi: hanzoai/.github is a PRIVATE repo and both orgs are
+# on the free plan (no shared enterprise), so GitHub blocks the cross-org
+# `uses:` at parse time — every luxfi caller of it currently fails at 0s. This
+# workflow builds the identical image (multi-stage Dockerfile → GHCR) entirely
+# within the luxfi org, so it actually runs.
+
 on:
   workflow_dispatch:
   push:
-    branches: [main, dev, test]
-    tags: ['v*']
+    branches: [main]
 
 permissions:
   contents: read
   packages: write
 
 jobs:
-  docker:
-    uses: hanzoai/.github/.github/workflows/docker-build.yml@main
-    with:
-      image: ghcr.io/luxfi/work-board
-      # Bake the live, CORS-enabled Zoo RPC into the static bundle at build time.
-      # The board reads the on-chain work-market directly from this URL.
-      build-args: |
-        VITE_RPC_URL=https://api.zoo.network/v1/bc/C/rpc
-      runner-amd64: '["self-hosted","linux","amd64"]'
-      runner-arm64: '["self-hosted","linux","arm64"]'
-      runner-deploy: '["self-hosted","linux","amd64"]'
-    secrets: inherit
+  build:
+    # lux-build-amd64: in-cluster ARC scale-set (lux-k8s, amd64 DOKS, DinD).
+    # amd64-only — the zoo-k8s deploy target is amd64; a static SPA needs no arm64.
+    runs-on: lux-build-amd64
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker-container
+          driver-opts: |
+            network=host
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/luxfi/work-board
+          # Immutable sha-<sha7> per commit; never :latest / :main.
+          flavor: |
+            latest=false
+          tags: |
+            type=sha,format=short,prefix=sha-
+
+      - name: Build & push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          platforms: linux/amd64
+          push: true
+          # Bake the live, CORS-enabled Zoo RPC into the bundle at build time.
+          build-args: |
+            VITE_RPC_URL=https://api.zoo.network/v1/bc/C/rpc
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: false
