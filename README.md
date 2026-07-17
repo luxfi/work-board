@@ -29,12 +29,19 @@ For production, build with the real RPC baked in:
 
 ## Deploy
 
-CI (`.github/workflows/docker.yml`) builds the image on every push to `main`
-via the canonical `hanzoai/.github` reusable and pushes it to
+CI (`.github/workflows/docker.yml`) builds the image on every push to `main` on
+luxfi's in-cluster ARC pool and pushes it to
 `ghcr.io/luxfi/work-board:sha-<commit>` — never built locally. It runs on
-zoo-k8s (namespace `zoo-mainnet`) behind hanzoai/ingress at
-**https://work.zoo.network**. Manifests live in `k8s/` (Deployment + Service +
-Ingress): pin `k8s/deployment.yaml` to the CI tag, then `kubectl apply -f k8s/`.
+zoo-k8s (namespace `zoo-mainnet`) behind hanzoai/ingress (Traefik) at
+**https://work.zoo.network**. Manifests live in `k8s/`:
+
+- `deployment.yaml` + `service.yaml` — 2 replicas serving `dist` on :3000,
+  Service :80 → :3000. Pin the Deployment to the CI tag, then
+  `kubectl -n zoo-mainnet apply -f k8s/deployment.yaml -f k8s/service.yaml`.
+- `route.yaml` — the Traefik dynamic-config router (host → Service, TLS via the
+  ingress's built-in ACME / Cloudflare DNS-01 resolver). hanzoai/ingress routes
+  every public zoo host through the `zoo-dynamic` ConfigMap (`@file` provider),
+  not Ingress objects; merge this fragment in (see the header in `route.yaml`).
 
 ## Data source (Zoo 200200)
 
