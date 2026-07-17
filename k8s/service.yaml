@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: work-board
+  namespace: zoo-mainnet
+  labels:
+    app: work-board
+spec:
+  selector:
+    app: work-board
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000

@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: work-board
+  namespace: zoo-mainnet
+  labels:
+    app: work-board
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: work-board
+  template:
+    metadata:
+      labels:
+        app: work-board
+    spec:
+      # Pull the CI-built image from GHCR (ghcr.io/luxfi/*).
+      imagePullSecrets:
+        - name: ghcr-luxfi
+      containers:
+        - name: work-board
+          # Pinned to the immutable CI tag (ghcr.io/luxfi/work-board:sha-<commit>).
+          # CI builds every push to main; bump this to roll a new build.
+          image: ghcr.io/luxfi/work-board:bootstrap
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 20
