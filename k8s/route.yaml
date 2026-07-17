@@ -1,0 +1,31 @@
+# Traefik (hanzoai/ingress) dynamic-config route for work.zoo.network.
+#
+# This cluster's hanzoai/ingress (Traefik v3) routes every public host via the
+# @file provider — ConfigMap zoo-system/zoo-dynamic mounted at
+# /etc/traefik/dynamic — NOT via Kubernetes Ingress objects. api.zoo.network is
+# served exactly this way (api-zoo-network router). TLS is auto-issued by
+# Traefik's built-in ACME resolver over Cloudflare DNS-01 (certResolver:
+# letsencrypt), so no cert-manager Certificate/secret is involved.
+#
+# Apply by merging this fragment into the zoo-dynamic ConfigMap's routes.yaml:
+#   CM=zoo-dynamic; NS=zoo-system
+#   kubectl -n $NS get configmap $CM -o jsonpath='{.data.routes\.yaml}' > /tmp/routes.yaml
+#   yq eval-all 'select(fileIndex==0) * select(fileIndex==1)' /tmp/routes.yaml k8s/route.yaml > /tmp/merged.yaml
+#   kubectl -n $NS patch configmap $CM --type merge \
+#     -p "$(jq -n --rawfile r /tmp/merged.yaml '{data:{"routes.yaml":$r}}')"
+# Traefik (--providers.file.watch=true) hot-reloads within ~60s and issues the cert.
+http:
+  routers:
+    work-zoo-network:
+      entryPoints:
+        - websecure
+      rule: Host(`work.zoo.network`)
+      service: work-board
+      tls:
+        certResolver: letsencrypt
+  services:
+    work-board:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: http://work-board.zoo-mainnet.svc.cluster.local:80
