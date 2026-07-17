@@ -22,7 +22,7 @@ spec:
         - name: work-board
           # Pinned to the immutable CI tag (ghcr.io/luxfi/work-board:sha-<commit>).
           # CI builds every push to main; bump this to roll a new build.
-          image: ghcr.io/luxfi/work-board:bootstrap
+          image: ghcr.io/luxfi/work-board:sha-bb049ad
           ports:
             - containerPort: 3000
           resources:
