@@ -6,13 +6,26 @@ import { PrimaryButton, GhostButton, IconSort, IconFilter, IconSearch } from '..
 // Connect / Follow — top-right on every content view. Connect points at the org's
 // Hanzo IAM OIDC entry (wired by the CTO agent); until then it falls back to the
 // org's Discord so the button is never dead.
-export function Topbar() {
+export function Topbar({ onSearch }: { onSearch?: () => void }) {
   const connectHref = ORG.iam?.authUrl ?? ORG.social.discord ?? ORG.social.website ?? '#';
   return (
     <div className="absolute right-6 top-5 z-10 flex flex-col items-end gap-2">
-      <a href={connectHref} target="_blank" rel="noreferrer noopener">
-        <PrimaryButton>Connect</PrimaryButton>
-      </a>
+      <div className="flex items-center gap-2">
+        {onSearch && (
+          <button
+            onClick={onSearch}
+            className="flex items-center gap-2 rounded-md bg-white/5 px-2.5 py-1.5 text-sm text-neutral-400 ring-1 ring-inset ring-white/10 transition-colors hover:bg-white/10 hover:text-neutral-200"
+            aria-label="Search (⌘K)"
+          >
+            <IconSearch className="h-4 w-4" />
+            <span>Search</span>
+            <kbd className="rounded bg-white/8 px-1.5 py-0.5 text-[10px] text-neutral-500">⌘K</kbd>
+          </button>
+        )}
+        <a href={connectHref} target="_blank" rel="noreferrer noopener">
+          <PrimaryButton>Connect</PrimaryButton>
+        </a>
+      </div>
       <GhostButton>★ Follow</GhostButton>
     </div>
   );
