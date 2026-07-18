@@ -4,7 +4,8 @@ import { skillMeta } from './skills';
 import { formatReward } from './reward';
 import type { NftMeta } from './reward';
 import type { Reward } from './types';
-import { NATIVE_SYMBOL, ORG } from './config';
+import { NATIVE_SYMBOL, ORG, BRAND_KEY } from './config';
+import { BRAND_LOGOS } from './brand-logos';
 
 // ---- Brand accent ----
 export const accent: CSSProperties = { backgroundColor: 'var(--brand)' };
@@ -17,7 +18,7 @@ export const accentText: CSSProperties = { color: 'var(--brand)' };
 // the logo fields defensively (optional) — ae530aa6 supplies them; until then the
 // letter tile / name stand in, and the image appears the moment the field lands.
 export function BrandMark({ size = 28, className = '' }: { size?: number; className?: string }) {
-  const mark = (ORG as { logoMark?: string }).logoMark;
+  const mark = BRAND_LOGOS[BRAND_KEY].logoMark;
   const radius = Math.round(size * 0.28);
   if (mark) {
     return (
@@ -43,7 +44,7 @@ export function BrandMark({ size = 28, className = '' }: { size?: number; classN
 }
 
 export function BrandLogo({ className = '' }: { className?: string }) {
-  const logo = (ORG as { logo?: string }).logo;
+  const logo = BRAND_LOGOS[BRAND_KEY].logo;
   return (
     <span className={`flex min-w-0 items-center gap-2.5 ${className}`}>
       {logo ? (
