@@ -97,8 +97,8 @@ export function TaskDetail({ task, ws }: { task: Task; ws: Workspace }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 px-4 py-10 overflow-y-auto" onClick={closeTask}>
-      <div className="w-full max-w-4xl rounded-xl bg-[#161619] shadow-2xl ring-1 ring-inset ring-white/10" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-stretch justify-center overflow-y-auto bg-black/60 sm:items-start sm:px-4 sm:py-10" onClick={closeTask}>
+      <div className="min-h-full w-full max-w-4xl bg-[var(--surface)] shadow-2xl ring-1 ring-inset ring-white/10 sm:min-h-0 sm:rounded-xl" onClick={(e) => e.stopPropagation()}>
         {/* header */}
         <div className="flex items-start justify-between gap-3 border-b border-white/6 px-6 py-4">
           <div className="min-w-0">

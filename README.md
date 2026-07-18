@@ -1,10 +1,16 @@
 # Work Board
 
-White-label on-chain bounty kanban — a DAO's "dework". It reads a live
-BountyV1 / EscrowV1 / ReputationV1 work-market directly over JSON-RPC (no
-subgraph) and renders it as a kanban board. The differentiator is the
-**portable on-chain reputation** surfaced on every card: it lives in
-ReputationV1 and travels with the worker's address, not the platform.
+White-label on-chain community work platform — a DAO's "Dework". It reads a live
+Bounty / Escrow / Reputation / Karma work-market directly over JSON-RPC (no
+subgraph) and renders the full Dework surface: **Overview** (org header + time-to-
+payment / total-paid stats + Bounties category grid), **Board** (To Do / In
+Progress / In Review / Done kanban), **Open Tasks**, **Leaderboards** (Top
+Contributors / Reviewers; Task Points = global Karma), **Community Suggestions**,
+**Combined Board**, per-Space tabs, a **task detail** with the real on-chain
+activity log + apply flow, and a cross-org **Explore**. The differentiator is
+**portable reputation**: per-DAO Reputation + global soul-bound Karma travel with
+the worker's address, not the platform. Mobile-first (390px up); every view also
+renders from a fixture with no wallet/chain, so it is always screenshot-able.
 
 One repo, one Dockerfile. A build-time brand (`VITE_BRAND`, default `zoo`)
 selects the white-label profile — chain, addresses, owner label, header/title,
@@ -62,20 +68,20 @@ header in each `route.yaml`).
 
 | Contract     | Address                                      |
 | ------------ | -------------------------------------------- |
-| BountyV1     | `0x3EDb4a0104614b4aC12D5babCE984291aE8BE8E7` |
-| EscrowV1     | `0x095E68282aea751Cc70A2Be565270f1B6AB0229C` |
-| ReputationV1 | `0xed976852e8c2b1283e4F475845046B679224460D` |
+| Bounty     | `0x3EDb4a0104614b4aC12D5babCE984291aE8BE8E7` |
+| Escrow     | `0x095E68282aea751Cc70A2Be565270f1B6AB0229C` |
+| Reputation | `0xed976852e8c2b1283e4F475845046B679224460D` |
 | owner        | `0x229599f227231d8C90fcF1a78589F5DC4b7A6962` (Zoo DAO Safe) |
 
 **Pars 494949**
 
 | Contract     | Address                                      |
 | ------------ | -------------------------------------------- |
-| BountyV1     | `0x316B41c886c7D4B4e38cBB08a243776Ed977cf1F` |
-| EscrowV1     | `0xD5890D32d603a04E35ec7dBAbDCD0CA400f07E92` |
-| ReputationV1 | `0x155d1363c23467929FB709FCFa0afC51F3497aB6` |
+| Bounty     | `0x316B41c886c7D4B4e38cBB08a243776Ed977cf1F` |
+| Escrow     | `0xD5890D32d603a04E35ec7dBAbDCD0CA400f07E92` |
+| Reputation | `0x155d1363c23467929FB709FCFa0afC51F3497aB6` |
 | owner        | `0x4CEA4ac1C874a340B06e0422E77a477463C3a542` (Pars DAO Safe) |
 
 `bountyCount()` + `bounties(i)` give the current struct; `BountyProposed` /
-`WorkSubmitted` logs give `issueRef` / `deliverableRef`; `ReputationV1.completedOf` /
+`WorkSubmitted` logs give `issueRef` / `deliverableRef`; `Reputation.completedOf` /
 `earnedOf` give the worker's score. ABIs are copied into `src/abi.ts` (no cross-repo import).

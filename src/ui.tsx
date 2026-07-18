@@ -29,14 +29,14 @@ export function AvatarStack({ addrs, max = 7, size = 26 }: { addrs: string[]; ma
   return (
     <div className="flex items-center">
       {shown.map((a, i) => (
-        <span key={a + i} style={{ marginLeft: i === 0 ? 0 : -8, zIndex: max - i }} className="rounded-full ring-2 ring-[#17171a]">
+        <span key={a + i} style={{ marginLeft: i === 0 ? 0 : -8, zIndex: max - i }} className="rounded-full ring-2 ring-[var(--surface)]">
           <Avatar addr={a} size={size} />
         </span>
       ))}
       {extra > 0 && (
         <span
           style={{ marginLeft: -8, width: size, height: size }}
-          className="inline-flex items-center justify-center rounded-full bg-neutral-700 text-[10px] font-semibold text-neutral-200 ring-2 ring-[#17171a]"
+          className="inline-flex items-center justify-center rounded-full bg-neutral-700 text-[10px] font-semibold text-neutral-200 ring-2 ring-[var(--surface)]"
         >
           +{extra}
         </span>
@@ -162,6 +162,7 @@ export const IconChevronRight = svg(<path d="m9 6 6 6-6 6" />);
 export const IconChevronsLeft = svg(<path d="m11 7-5 5 5 5M18 7l-5 5 5 5" />);
 export const IconInfo = svg(<><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></>);
 export const IconX = svg(<path d="M6 6l12 12M18 6 6 18" />);
+export const IconMenu = svg(<path d="M4 6h16M4 12h16M4 18h16" />);
 export const IconDots = svg(<path d="M5 12h.01M12 12h.01M19 12h.01" />);
 export const IconExternal = svg(<><path d="M14 4h6v6" /><path d="M20 4 10 14" /><path d="M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5" /></>);
 export const IconQuestion = svg(<><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .8-1 1.7M12 17h.01" /></>);

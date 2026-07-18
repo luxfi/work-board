@@ -22,7 +22,7 @@ export type TabDef = { key: string; label: string; icon: ReactNode };
 
 export function Tabs({ tabs, active, onSelect }: { tabs: TabDef[]; active: string; onSelect: (k: string) => void }) {
   return (
-    <div className="flex items-center gap-1">
+    <div className="scroll-x flex items-center gap-1 whitespace-nowrap">
       {tabs.map((t) => {
         const on = t.key === active;
         return (

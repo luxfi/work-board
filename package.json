@@ -1,7 +1,7 @@
 {
   "name": "work-board",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "description": "White-label on-chain community work platform (Zoo, Pars) — a Dework-style Overview / Board / Open Tasks / Leaderboards / Suggestions / task-detail surface reading the live Bounty / Escrow / Reputation / Karma work-market over JSON-RPC.",
   "scripts": {

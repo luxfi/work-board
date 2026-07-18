@@ -31,8 +31,8 @@ function NewSuggestionModal({ onClose, onCreate }: { onClose: () => void; onCrea
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 px-4 pt-28" onClick={onClose}>
-      <div className="w-full max-w-2xl rounded-xl bg-[#1c1c20] p-5 shadow-2xl ring-1 ring-inset ring-white/10" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 sm:items-start sm:px-4 sm:pt-28" onClick={onClose}>
+      <div className="w-full max-w-2xl rounded-t-2xl bg-[var(--surface)] p-5 pb-8 shadow-2xl ring-1 ring-inset ring-white/10 sm:rounded-xl sm:pb-5" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between">
           <input
             autoFocus
@@ -88,7 +88,7 @@ export function Suggestions() {
   const trending = [...list].sort((a, b) => b.votes - a.votes);
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-6">
+    <div className="mx-auto max-w-4xl px-4 py-5 md:px-6 md:py-6">
       <div className="mb-5 flex items-center justify-between">
         <button className="flex items-center gap-1.5 text-lg font-semibold text-neutral-100">
           Trending <IconChevronDown className="h-4 w-4 text-neutral-500" />
@@ -106,7 +106,7 @@ export function Suggestions() {
       ) : (
         <div className="flex flex-col gap-2">
           {trending.map((s) => (
-            <div key={s.id} className="flex items-start gap-3 rounded-lg bg-[#1a1a1e] p-3 ring-1 ring-inset ring-white/6">
+            <div key={s.id} className="flex items-start gap-3 rounded-lg bg-[var(--surface)] p-3 ring-1 ring-inset ring-white/6">
               <button
                 onClick={() => toggleVote(s.id)}
                 className={`flex w-12 shrink-0 flex-col items-center rounded-md py-1.5 ring-1 ring-inset transition-colors ${
