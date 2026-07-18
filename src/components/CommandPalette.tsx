@@ -3,7 +3,7 @@ import { ORG } from '../config';
 import type { Task } from '../types';
 import { navigate, openTask } from '../router';
 import { openConnect } from '../auth';
-import { IconSearch, IconGrid, IconBoard, IconTrophy, IconBulb, IconPlus, IconDoc, IconExternal } from '../ui';
+import { Input, IconSearch, IconGrid, IconBoard, IconTrophy, IconBulb, IconPlus, IconDoc, IconExternal } from '../ui';
 
 // ⌘K command palette — global fuzzy search + quick-nav across views, spaces and
 // tasks, plus quick actions. Keyboard-navigable (↑/↓/Enter, Esc). Centered on
@@ -108,10 +108,11 @@ export function CommandPalette({ tasks, onClose }: { tasks: Task[]; onClose: () 
       <div className="flex max-h-[85vh] w-full max-w-xl flex-col overflow-hidden rounded-t-2xl bg-[var(--surface)] shadow-2xl ring-1 ring-inset ring-white/10 sm:max-h-[70vh] sm:rounded-xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-2 border-b border-[var(--border)] px-4 py-3">
           <IconSearch className="h-4 w-4 text-neutral-500" />
-          <input
+          <Input
+            variant="unstyled"
             autoFocus
             value={q}
-            onChange={(e) => setQ(e.target.value)}
+            onChangeText={setQ}
             placeholder="Search bounties, spaces, actions…"
             className="w-full bg-transparent text-sm text-neutral-100 placeholder:text-neutral-600 focus:outline-none"
           />

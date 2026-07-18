@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { GhostButton, IconSort, IconFilter, IconSearch } from '../ui';
+import { GhostButton, Input, IconSort, IconFilter, IconSearch } from '../ui';
 import { ConnectButton } from './Connect';
 
 // Connect / Follow — top-right on every content view. Connect resolves through the
@@ -67,9 +67,10 @@ export function Toolbar({ query, onQuery }: { query: string; onQuery: (q: string
       </button>
       <label className="flex items-center gap-1.5 rounded-md bg-white/5 px-2 py-1 ring-1 ring-inset ring-white/8">
         <IconSearch className="h-3.5 w-3.5" />
-        <input
+        <Input
+          variant="unstyled"
           value={query}
-          onChange={(e) => onQuery(e.target.value)}
+          onChangeText={onQuery}
           placeholder="Search tasks..."
           className="w-32 bg-transparent text-neutral-200 placeholder:text-neutral-600 focus:outline-none"
         />
