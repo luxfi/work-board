@@ -93,7 +93,7 @@ function SpaceCard({ space, rollup }: { space: Space; rollup: SpaceRollup }) {
   return (
     <button
       onClick={() => navigate(`/space/${space.key}/board`)}
-      className="flex flex-col gap-4 rounded-xl bg-[#1a1a1e] p-4 text-left ring-1 ring-inset ring-white/6 transition-colors hover:bg-[#202025]"
+      className="flex flex-col gap-4 rounded-xl bg-[var(--surface)] p-4 text-left ring-1 ring-inset ring-white/6 transition-colors hover:bg-[var(--hover)]"
     >
       <div className="flex items-center gap-2">
         <span className="text-xl leading-none">{space.emoji}</span>
@@ -134,7 +134,7 @@ function RightRail({ ws, tasks }: { ws: Workspace; tasks: Task[] }) {
   const admins = [ORG.addresses.owner, ...(ORG.addresses.governor ? [ORG.addresses.governor] : [])];
 
   return (
-    <div className="flex w-72 shrink-0 flex-col gap-6">
+    <div className="flex w-full shrink-0 flex-col gap-6 lg:w-72">
       <section>
         <h3 className="mb-2 text-sm font-semibold text-neutral-200">About</h3>
         <p className="text-sm text-neutral-400">{ORG.tagline}</p>
@@ -181,9 +181,9 @@ export function Overview({ ws, tasks }: { ws: Workspace; tasks: Task[] }) {
   const empty = { open: 0, contributors: 0, total: 0 };
 
   return (
-    <div className="px-8 py-6">
+    <div className="px-4 py-5 md:px-8 md:py-6">
       <OrgHeader ws={ws} />
-      <div className="mt-6 flex gap-8">
+      <div className="mt-6 flex flex-col gap-8 lg:flex-row">
         <div className="min-w-0 flex-1">
           <DiscordBanner />
 

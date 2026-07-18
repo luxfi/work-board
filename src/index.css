@@ -2,6 +2,16 @@
 
 :root {
   color-scheme: dark;
+  /* Dework dark palette — the one place the surface tokens live. */
+  --bg: #0e0e10;
+  --rail: #141416;
+  --surface: #17171b;
+  --surface-2: #1b1b20;
+  --border: #232328;
+  --hover: #1e1e24;
+  --muted: #8a8a93;
+  /* --brand is set per-org at runtime from brands.ts (App.tsx). */
+  --brand: #6c5ce7;
 }
 
 html,
@@ -12,10 +22,38 @@ body,
 
 body {
   margin: 0;
-  background-color: #0a0a0a;
+  background-color: var(--bg);
   color: #e5e5e5;
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
     sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* Mobile-first: the page must never scroll sideways at 390px. Wide content
+     (kanban, tables) scrolls inside its own overflow-x container instead. */
+  overflow-x: hidden;
+}
+
+/* Safe-area insets for notched phones (drawer + sticky bars read these). */
+#root {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Fluid base type: a touch smaller on phones, steady on desktop. */
+html {
+  font-size: clamp(14px, 0.9rem + 0.2vw, 16px);
+}
+
+/* Thin, unobtrusive scrollbars for the horizontal scroll regions. */
+.scroll-x {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+.scroll-x::-webkit-scrollbar {
+  height: 6px;
+}
+.scroll-x::-webkit-scrollbar-thumb {
+  background: #2b2b31;
+  border-radius: 9999px;
 }

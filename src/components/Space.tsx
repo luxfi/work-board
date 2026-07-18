@@ -31,7 +31,7 @@ function SpaceOverview({ tasks, spaceSkills }: { tasks: Task[]; spaceSkills: str
     <div className="max-w-2xl">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {counts.map((c) => (
-          <div key={c.title} className="rounded-lg bg-[#1a1a1e] p-3 ring-1 ring-inset ring-white/6">
+          <div key={c.title} className="rounded-lg bg-[var(--surface)] p-3 ring-1 ring-inset ring-white/6">
             <div className="text-2xl font-bold tabular-nums text-neutral-100">{c.n}</div>
             <div className="text-xs text-neutral-500">{c.title}</div>
           </div>
@@ -64,12 +64,12 @@ export function SpaceView({ tasks, spaceKey, tab }: { tasks: Task[]; spaceKey: s
   }
 
   return (
-    <div className="px-8 py-6">
+    <div className="px-4 py-5 md:px-8 md:py-6">
       <div className="mb-1 flex items-center gap-2">
         <span className="text-2xl leading-none">{space.emoji}</span>
         <h1 className="text-2xl font-bold text-neutral-50">{space.name}</h1>
       </div>
-      <div className="mb-6 mt-3 flex items-center justify-between border-b border-white/6 pr-32">
+      <div className="mb-6 mt-3 flex flex-col gap-2 border-b border-white/6 md:flex-row md:items-center md:justify-between md:pr-32">
         <Tabs tabs={TAB_DEFS} active={tab} onSelect={(k) => navigate(`/space/${spaceKey}/${k}`)} />
         {(tab === 'board' || tab === 'tasks') && (
           <div className="pb-2">

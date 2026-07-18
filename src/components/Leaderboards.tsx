@@ -88,17 +88,23 @@ function Empty() {
   );
 }
 
-function ContributorTable({ rows, hasKarma }: { rows: Contributor[]; hasKarma: boolean }) {
+// Task Points = global Karma when the org has a Karma deployment; until then a
+// transparent proxy (tasks × 100) so the column is never blank. "Task Points = Karma."
+function taskPoints(c: Contributor): string {
+  return c.karma !== undefined ? formatAmount(c.karma) : c.points.toString();
+}
+
+function ContributorTable({ rows }: { rows: Contributor[] }) {
   if (rows.length === 0) return <Empty />;
   return (
-    <table className="w-full">
+    <div className="scroll-x">
+    <table className="w-full min-w-[460px]">
       <thead>
         <tr className="border-b border-white/6">
           <Th>Rank</Th>
           <Th>Username</Th>
           <Th right>Tasks Done</Th>
           <Th right>Task Points</Th>
-          {hasKarma && <Th right>Karma</Th>}
           <Th right>Earned</Th>
         </tr>
       </thead>
@@ -113,17 +119,13 @@ function ContributorTable({ rows, hasKarma }: { rows: Contributor[]; hasKarma: b
               </span>
             </td>
             <td className="px-3 py-2.5 text-right text-sm tabular-nums text-neutral-200">{c.completed.toString()}</td>
-            <td className="px-3 py-2.5 text-right text-sm tabular-nums text-neutral-300">{c.points.toString()}</td>
-            {hasKarma && (
-              <td className="px-3 py-2.5 text-right text-sm tabular-nums text-fuchsia-300" title="Global soul-bound Karma (portable across every DAO)">
-                {c.karma !== undefined ? formatAmount(c.karma) : '—'}
-              </td>
-            )}
+            <td className="px-3 py-2.5 text-right text-sm tabular-nums text-fuchsia-300" title="Task Points = global Karma (portable across every DAO)">{taskPoints(c)}</td>
             <td className="px-3 py-2.5 text-right text-sm tabular-nums text-emerald-300">{formatAmount(c.earned)}</td>
           </tr>
         ))}
       </tbody>
     </table>
+    </div>
   );
 }
 
@@ -131,7 +133,8 @@ function ReviewerTable({ rows }: { rows: Contributor[] }) {
   const reviewers = rows.filter((r) => r.reviewed > 0).sort((a, b) => b.reviewed - a.reviewed);
   if (reviewers.length === 0) return <Empty />;
   return (
-    <table className="w-full">
+    <div className="scroll-x">
+    <table className="w-full min-w-[460px]">
       <thead>
         <tr className="border-b border-white/6">
           <Th>Rank</Th>
@@ -151,11 +154,14 @@ function ReviewerTable({ rows }: { rows: Contributor[] }) {
               </span>
             </td>
             <td className="px-3 py-2.5 text-right text-sm tabular-nums text-neutral-200">{c.reviewed}</td>
-            <td className="px-3 py-2.5 text-right text-sm tabular-nums text-neutral-300">{c.reviewed * 100}</td>
+            <td className="px-3 py-2.5 text-right text-sm tabular-nums text-fuchsia-300" title="Task Points = global Karma">
+              {c.karma !== undefined ? formatAmount(c.karma) : c.reviewed * 100}
+            </td>
           </tr>
         ))}
       </tbody>
     </table>
+    </div>
   );
 }
 
@@ -171,14 +177,12 @@ export function Leaderboards({ ws }: { ws: Workspace }) {
   );
   const contributorRows = useMemo(() => base.filter((c) => c.completed > 0n), [base]);
 
-  const hasKarma = ws.contributors.some((c) => c.karma !== undefined);
-
   return (
-    <div className="mx-auto max-w-6xl px-6 py-6">
+    <div className="mx-auto max-w-6xl px-4 py-5 md:px-6 md:py-6">
       <h1 className="mb-5 text-2xl font-bold text-neutral-100">Leaderboards</h1>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <div className="rounded-xl bg-[#151518] ring-1 ring-inset ring-white/6">
+        <div className="rounded-xl bg-[var(--surface)] ring-1 ring-inset ring-white/6">
           <div className="flex flex-wrap items-center gap-3 px-4 py-3">
             <h2 className="text-sm font-semibold text-neutral-200">Top Contributors</h2>
             <WindowToggle value={win} onChange={setWin} />
@@ -186,10 +190,10 @@ export function Leaderboards({ ws }: { ws: Workspace }) {
               <Search placeholder="Search contributors..." />
             </div>
           </div>
-          <ContributorTable rows={contributorRows} hasKarma={hasKarma} />
+          <ContributorTable rows={contributorRows} />
         </div>
 
-        <div className="rounded-xl bg-[#151518] ring-1 ring-inset ring-white/6">
+        <div className="rounded-xl bg-[var(--surface)] ring-1 ring-inset ring-white/6">
           <div className="flex flex-wrap items-center gap-3 px-4 py-3">
             <h2 className="text-sm font-semibold text-neutral-200">Top Reviewers</h2>
             <WindowToggle value={win} onChange={setWin} />
@@ -201,7 +205,7 @@ export function Leaderboards({ ws }: { ws: Workspace }) {
         </div>
       </div>
 
-      <div className="mt-6 rounded-xl bg-[#151518] ring-1 ring-inset ring-white/6">
+      <div className="mt-6 rounded-xl bg-[var(--surface)] ring-1 ring-inset ring-white/6">
         <div className="flex items-center justify-between px-4 py-3">
           <h2 className="text-sm font-semibold text-neutral-200">All Contributors</h2>
           <Search placeholder="Search contributors..." />
@@ -209,7 +213,8 @@ export function Leaderboards({ ws }: { ws: Workspace }) {
         {ws.contributors.length === 0 ? (
           <Empty />
         ) : (
-          <table className="w-full">
+          <div className="scroll-x">
+          <table className="w-full min-w-[460px]">
             <thead>
               <tr className="border-b border-white/6">
                 <Th>Username</Th>
@@ -235,6 +240,7 @@ export function Leaderboards({ ws }: { ws: Workspace }) {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>
