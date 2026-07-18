@@ -1,11 +1,25 @@
 import type { Address } from 'viem';
 
+// Brand logos — embedded at build time. Vite inlines these small SVGs as `data:`
+// URIs (well under the 4 KB asset-inline limit), which the strict production CSP
+// permits via `img-src 'self' data:`; a missing file fails the build. Each mark is
+// the brand's own canonical asset (from its @<org>/brand package or app public/),
+// never cross-brand: a Zoo build embeds only Zoo. `logo` is the full wordmark,
+// `logoMark` the square/icon mark. Zoo ships one trigram that serves as both.
+import zooWordmark from './assets/brands/zoo/wordmark.svg';
+import parsWordmark from './assets/brands/pars/wordmark.svg';
+import parsMark from './assets/brands/pars/mark.svg';
+import luxWordmark from './assets/brands/lux/wordmark.svg';
+import luxMark from './assets/brands/lux/mark.svg';
+import hanzoWordmark from './assets/brands/hanzo/wordmark.svg';
+import hanzoMark from './assets/brands/hanzo/mark.svg';
+
 // The one place a white-label lives. A brand is selected at BUILD time by the
 // VITE_BRAND build-arg (see Dockerfile / docker.yml); default is 'zoo'. Every
 // brand-varying value — chain, addresses, owner label, header/title text, the RPC
-// host baked into the CSP, and all Dework presentation (tagline, accent, socials,
-// Spaces/categories) — is a field here, so standing up a new board is a data
-// change, not a code change. Never cross brands: a Zoo build shows only Zoo.
+// host baked into the CSP, and all Dework presentation (tagline, accent, logos,
+// socials, Spaces/categories) — is a field here, so standing up a new board is a
+// data change, not a code change. Never cross brands: a Zoo build shows only Zoo.
 
 // A Space is a bounty category (Dework "Space"). One Bounty serves the whole
 // org, so a bounty is routed to a Space by matching its issueRef against `match`
@@ -44,6 +58,12 @@ export type Brand = {
   tagline: string;
   // Accent hex — primary buttons, active nav, highlights. Per-brand, never cross.
   accent: string;
+  // Optional secondary/highlight hex (e.g. Pars gold). Omit for single-accent brands.
+  accentSecondary?: string;
+  // Brand logos — embedded SVGs (imported → build-inlined `data:` URI string).
+  // `logo` is the full wordmark; `logoMark` the square/icon mark. Never cross-brand.
+  logo: string;
+  logoMark: string;
   usdPerNative: number; // native → USD for the "Total paid: $X" header stat
   social: { discord?: string; twitter?: string; website?: string };
   tags: string[]; // About-panel chips
@@ -73,13 +93,16 @@ export const BRANDS = {
     org: 'Zoo DAO',
     workspace: 'Zoo',
     tagline: 'Open AI research network — DeAI & DeSci',
-    accent: '#22c55e',
+    accent: '#6c5efb',
+    logo: zooWordmark,
+    logoMark: zooWordmark,
     usdPerNative: 1,
     social: { discord: 'https://discord.gg/zoo', twitter: 'https://twitter.com/zoo_labs', website: 'https://zoo.ngo' },
     tags: ['DeAI', 'DeSci', 'Research', 'Open Source', 'AI'],
     spaces: [
       { key: 'engineering', name: 'Engineering', emoji: '⚙️', skills: ['Development', 'Product'], match: ['zooai/', 'zoo-'] },
       { key: 'research', name: 'AI & Research', emoji: '🧬', skills: ['Research', 'Data Analytics'], match: ['research/', 'zoo-research'] },
+      { key: 'ecosystem', name: 'Ecosystem & Partnerships', emoji: '🤝', skills: ['Partnerships', 'Business Development'] },
       { key: 'community', name: 'Community & Social', emoji: '💬', skills: ['Community', 'Marketing'] },
       { key: 'content', name: 'Content Creation', emoji: '🎬', skills: ['Writing', 'Design'] },
       { key: 'governance', name: 'Governance', emoji: '🏛️', skills: ['Legal', 'Operations'], match: ['zips/'] },
@@ -100,19 +123,85 @@ export const BRANDS = {
     org: 'Pars DAO',
     workspace: 'Pars',
     tagline: 'The community L1',
-    accent: '#3b82f6',
+    accent: '#1C3879',
+    accentSecondary: '#D4AF37',
+    logo: parsWordmark,
+    logoMark: parsMark,
     usdPerNative: 1,
     social: { website: 'https://pars.network' },
     tags: ['Community', 'L1', 'Governance'],
     spaces: [
       { key: 'engineering', name: 'Engineering', emoji: '⚙️', skills: ['Development', 'Product'] },
+      { key: 'ecosystem', name: 'Ecosystem & Partnerships', emoji: '🤝', skills: ['Partnerships', 'Business Development'] },
       { key: 'community', name: 'Community & Social', emoji: '💬', skills: ['Community', 'Marketing'] },
       { key: 'content', name: 'Content Creation', emoji: '🎬', skills: ['Writing', 'Design'] },
+      { key: 'education', name: 'Education & Research', emoji: '📚', skills: ['Education', 'Research'] },
+      { key: 'governance', name: 'Governance', emoji: '🏛️', skills: ['Legal', 'Operations'], match: ['pips/'] },
     ],
     rpcUrl: 'https://api.pars.network/v1/bc/C/rpc',
   },
-  // lux + hanzo brands land in the batch-3 white-label pass, together with their
-  // fixtures, CI matrix entries and k8s manifests (post flag-day / deploying).
+  lux: {
+    chainId: 96369,
+    chainName: 'Lux',
+    nativeSymbol: 'LUX',
+    addresses: {
+      // TODO: no work-market deployed yet (Lux frozen / Hanzo key-gap)
+      bounty: '0x0000000000000000000000000000000000000000',
+      escrow: '0x0000000000000000000000000000000000000000',
+      reputation: '0x0000000000000000000000000000000000000000',
+      owner: '0x0000000000000000000000000000000000000000',
+    },
+    ownerLabel: 'Lux DAO Safe',
+    org: 'Lux DAO',
+    workspace: 'Lux',
+    tagline: 'Quantum-safe multi-consensus L1',
+    accent: '#7000FF',
+    logo: luxWordmark,
+    logoMark: luxMark,
+    usdPerNative: 1,
+    social: { discord: 'https://discord.gg/lux', twitter: 'https://x.com/luxfi', website: 'https://lux.network' },
+    tags: ['Consensus', 'Post-Quantum', 'L1', 'DeFi', 'Open Source'],
+    spaces: [
+      { key: 'engineering', name: 'Engineering', emoji: '⚙️', skills: ['Development', 'Product'], match: ['luxfi/', 'lux-'] },
+      { key: 'ecosystem', name: 'Ecosystem & Partnerships', emoji: '🤝', skills: ['Partnerships', 'Business Development'] },
+      { key: 'community', name: 'Community & Social', emoji: '💬', skills: ['Community', 'Marketing'] },
+      { key: 'content', name: 'Content Creation', emoji: '🎬', skills: ['Writing', 'Design'] },
+      { key: 'research', name: 'Research', emoji: '🔬', skills: ['Research', 'Cryptography'] },
+      { key: 'governance', name: 'Governance', emoji: '🏛️', skills: ['Legal', 'Operations'] },
+    ],
+    rpcUrl: 'https://api.lux.network/v1/bc/C/rpc',
+  },
+  hanzo: {
+    chainId: 36963,
+    chainName: 'Hanzo',
+    nativeSymbol: 'AI',
+    addresses: {
+      // TODO: no work-market deployed yet (Lux frozen / Hanzo key-gap)
+      bounty: '0x0000000000000000000000000000000000000000',
+      escrow: '0x0000000000000000000000000000000000000000',
+      reputation: '0x0000000000000000000000000000000000000000',
+      owner: '0x0000000000000000000000000000000000000000',
+    },
+    ownerLabel: 'Hanzo DAO Safe',
+    org: 'Hanzo DAO',
+    workspace: 'Hanzo',
+    tagline: 'Frontier AI & foundational models',
+    accent: '#ea580c',
+    logo: hanzoWordmark,
+    logoMark: hanzoMark,
+    usdPerNative: 1,
+    social: { discord: 'https://discord.gg/hanzo', website: 'https://hanzo.ai' },
+    tags: ['AI', 'LLM', 'MCP', 'Agents', 'Open Source'],
+    spaces: [
+      { key: 'engineering', name: 'Engineering', emoji: '⚙️', skills: ['Development', 'Product'], match: ['hanzoai/', 'hanzo-'] },
+      { key: 'research', name: 'AI & Research', emoji: '🧠', skills: ['Research', 'Machine Learning'] },
+      { key: 'ecosystem', name: 'Ecosystem & Partnerships', emoji: '🤝', skills: ['Partnerships', 'Business Development'] },
+      { key: 'community', name: 'Community & Social', emoji: '💬', skills: ['Community', 'Marketing'] },
+      { key: 'content', name: 'Content Creation', emoji: '🎬', skills: ['Writing', 'Design'] },
+      { key: 'governance', name: 'Governance', emoji: '🏛️', skills: ['Legal', 'Operations'] },
+    ],
+    rpcUrl: 'https://api.hanzo.network/v1/bc/C/rpc',
+  },
 } as const satisfies Record<string, Brand>;
 
 export type BrandKey = keyof typeof BRANDS;
