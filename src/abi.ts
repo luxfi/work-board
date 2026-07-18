@@ -1,6 +1,6 @@
 // ABI fragments copied from the compiled Foundry artifacts
-//   contracts/out-foundry/BountyV1.sol/BountyV1.json
-//   contracts/out-foundry/ReputationV1.sol/ReputationV1.json
+//   dao/contracts/out-foundry/{Bounty,Reputation}.sol/*.json
+//   standard/contracts/governance/Karma.sol
 // Only the members this board actually reads are included (no cross-repo import).
 
 export const bountyAbi = [
@@ -40,6 +40,8 @@ export const bountyAbi = [
   },
 ] as const;
 
+// ---- Events (assemble refs, activity log, stats and reviewer counts) ----
+
 export const bountyProposedEvent = {
   type: 'event',
   name: 'BountyProposed',
@@ -55,6 +57,29 @@ export const bountyProposedEvent = {
   ],
 } as const;
 
+export const bountyFundedEvent = {
+  type: 'event',
+  name: 'BountyFunded',
+  anonymous: false,
+  inputs: [
+    { name: 'bountyId', type: 'uint256', indexed: true },
+    { name: 'funder', type: 'address', indexed: true },
+    { name: 'amount', type: 'uint256', indexed: false },
+  ],
+} as const;
+
+export const bountyClaimedEvent = {
+  type: 'event',
+  name: 'BountyClaimed',
+  anonymous: false,
+  inputs: [
+    { name: 'bountyId', type: 'uint256', indexed: true },
+    { name: 'worker', type: 'address', indexed: true },
+    { name: 'stake', type: 'uint256', indexed: false },
+    { name: 'claimDeadline', type: 'uint64', indexed: false },
+  ],
+} as const;
+
 export const workSubmittedEvent = {
   type: 'event',
   name: 'WorkSubmitted',
@@ -66,6 +91,63 @@ export const workSubmittedEvent = {
   ],
 } as const;
 
+export const workAcceptedEvent = {
+  type: 'event',
+  name: 'WorkAccepted',
+  anonymous: false,
+  inputs: [
+    { name: 'bountyId', type: 'uint256', indexed: true },
+    { name: 'approver', type: 'address', indexed: true },
+    { name: 'worker', type: 'address', indexed: true },
+  ],
+} as const;
+
+export const paymentReleasedEvent = {
+  type: 'event',
+  name: 'PaymentReleased',
+  anonymous: false,
+  inputs: [
+    { name: 'bountyId', type: 'uint256', indexed: true },
+    { name: 'worker', type: 'address', indexed: true },
+    { name: 'reward', type: 'uint256', indexed: false },
+    { name: 'stakeReturned', type: 'uint256', indexed: false },
+  ],
+} as const;
+
+export const bountyCancelledEvent = {
+  type: 'event',
+  name: 'BountyCancelled',
+  anonymous: false,
+  inputs: [
+    { name: 'bountyId', type: 'uint256', indexed: true },
+    { name: 'funder', type: 'address', indexed: true },
+    { name: 'amount', type: 'uint256', indexed: false },
+  ],
+} as const;
+
+export const bountyDisputedEvent = {
+  type: 'event',
+  name: 'BountyDisputed',
+  anonymous: false,
+  inputs: [
+    { name: 'bountyId', type: 'uint256', indexed: true },
+    { name: 'disputer', type: 'address', indexed: true },
+    { name: 'reasonRef', type: 'string', indexed: false },
+  ],
+} as const;
+
+export const bountyFinalizedEvent = {
+  type: 'event',
+  name: 'BountyFinalized',
+  anonymous: false,
+  inputs: [
+    { name: 'bountyId', type: 'uint256', indexed: true },
+    { name: 'finalizer', type: 'address', indexed: true },
+    { name: 'worker', type: 'address', indexed: true },
+  ],
+} as const;
+
+// ---- Reputation (per-DAO worker ledger) ----
 export const reputationAbi = [
   {
     type: 'function',
@@ -79,6 +161,42 @@ export const reputationAbi = [
     name: 'earnedOf',
     inputs: [{ name: 'worker_', type: 'address' }],
     outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+] as const;
+
+// ---- Karma (global soul-bound reputation; optional per org) ----
+export const karmaAbi = [
+  {
+    type: 'function',
+    name: 'karmaOf',
+    inputs: [{ name: 'account', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+] as const;
+
+// ---- NFT reward metadata (ERC-721 tokenURI / name, ERC-1155 uri) ----
+export const nftMetaAbi = [
+  {
+    type: 'function',
+    name: 'tokenURI',
+    inputs: [{ name: 'tokenId', type: 'uint256' }],
+    outputs: [{ name: '', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'uri',
+    inputs: [{ name: 'id', type: 'uint256' }],
+    outputs: [{ name: '', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    name: 'name',
+    inputs: [],
+    outputs: [{ name: '', type: 'string' }],
     stateMutability: 'view',
   },
 ] as const;
