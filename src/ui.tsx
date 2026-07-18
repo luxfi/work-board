@@ -4,11 +4,59 @@ import { skillMeta } from './skills';
 import { formatReward } from './reward';
 import type { NftMeta } from './reward';
 import type { Reward } from './types';
-import { NATIVE_SYMBOL } from './config';
+import { NATIVE_SYMBOL, ORG } from './config';
 
 // ---- Brand accent ----
 export const accent: CSSProperties = { backgroundColor: 'var(--brand)' };
 export const accentText: CSSProperties = { color: 'var(--brand)' };
+
+// ---- Brand identity (the ONE place the org's logo renders) ----
+// BrandMark is the square mark: brand.logoMark (an image src / data URI) when the
+// brand supplies one, else a letter tile on the accent. BrandLogo is the full
+// sidebar lockup: brand.logo when supplied, else mark + workspace name. Both read
+// the logo fields defensively (optional) — ae530aa6 supplies them; until then the
+// letter tile / name stand in, and the image appears the moment the field lands.
+export function BrandMark({ size = 28, className = '' }: { size?: number; className?: string }) {
+  const mark = (ORG as { logoMark?: string }).logoMark;
+  const radius = Math.round(size * 0.28);
+  if (mark) {
+    return (
+      <img
+        src={mark}
+        alt={ORG.workspace}
+        width={size}
+        height={size}
+        style={{ borderRadius: radius }}
+        className={`shrink-0 object-contain ${className}`}
+      />
+    );
+  }
+  return (
+    <span
+      aria-hidden
+      className={`flex shrink-0 items-center justify-center font-bold leading-none text-white ${className}`}
+      style={{ width: size, height: size, borderRadius: radius, backgroundColor: 'var(--brand)', fontSize: Math.round(size * 0.42) }}
+    >
+      {ORG.workspace.charAt(0)}
+    </span>
+  );
+}
+
+export function BrandLogo({ className = '' }: { className?: string }) {
+  const logo = (ORG as { logo?: string }).logo;
+  return (
+    <span className={`flex min-w-0 items-center gap-2.5 ${className}`}>
+      {logo ? (
+        <img src={logo} alt={ORG.workspace} className="h-7 w-auto max-w-full object-contain object-left" />
+      ) : (
+        <>
+          <BrandMark size={28} />
+          <span className="truncate text-sm font-semibold text-neutral-100">{ORG.workspace}</span>
+        </>
+      )}
+    </span>
+  );
+}
 
 // ---- Avatar (deterministic identity for an address) ----
 export function Avatar({ addr, size = 24, title }: { addr: string; size?: number; title?: string }) {

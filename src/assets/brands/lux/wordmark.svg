@@ -1,0 +1,5 @@
+<svg width="1024" height="256" viewBox="0 0 1024 256" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="48" width="160" height="160" fill="#000000"/>
+  <text x="80" y="172" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="140" fill="#FFFFFF" text-anchor="middle" letter-spacing="-6">L</text>
+  <text x="200" y="172" font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="140" fill="currentColor" letter-spacing="-6">Lux</text>
+</svg>
