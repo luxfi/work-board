@@ -182,7 +182,7 @@ export function Leaderboards({ ws }: { ws: Workspace }) {
       <h1 className="mb-5 text-2xl font-bold text-neutral-100">Leaderboards</h1>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <div className="rounded-xl bg-[var(--surface)] ring-1 ring-inset ring-white/6">
+        <div className="min-w-0 rounded-xl bg-[var(--surface)] ring-1 ring-inset ring-white/6">
           <div className="flex flex-wrap items-center gap-3 px-4 py-3">
             <h2 className="text-sm font-semibold text-neutral-200">Top Contributors</h2>
             <WindowToggle value={win} onChange={setWin} />
@@ -193,7 +193,7 @@ export function Leaderboards({ ws }: { ws: Workspace }) {
           <ContributorTable rows={contributorRows} />
         </div>
 
-        <div className="rounded-xl bg-[var(--surface)] ring-1 ring-inset ring-white/6">
+        <div className="min-w-0 rounded-xl bg-[var(--surface)] ring-1 ring-inset ring-white/6">
           <div className="flex flex-wrap items-center gap-3 px-4 py-3">
             <h2 className="text-sm font-semibold text-neutral-200">Top Reviewers</h2>
             <WindowToggle value={win} onChange={setWin} />
@@ -205,7 +205,7 @@ export function Leaderboards({ ws }: { ws: Workspace }) {
         </div>
       </div>
 
-      <div className="mt-6 rounded-xl bg-[var(--surface)] ring-1 ring-inset ring-white/6">
+      <div className="mt-6 min-w-0 rounded-xl bg-[var(--surface)] ring-1 ring-inset ring-white/6">
         <div className="flex items-center justify-between px-4 py-3">
           <h2 className="text-sm font-semibold text-neutral-200">All Contributors</h2>
           <Search placeholder="Search contributors..." />

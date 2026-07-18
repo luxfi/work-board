@@ -94,7 +94,7 @@ export function Board({ tasks }: { tasks: Task[] }) {
   return (
     <div className="scroll-x flex snap-x snap-mandatory gap-3 pb-2 xl:grid xl:grid-cols-4 xl:overflow-x-visible">
       {LANES.map((def) => (
-        <div key={def.lane} className="w-[86vw] shrink-0 snap-start sm:w-[62vw] md:w-[44vw] xl:w-auto">
+        <div key={def.lane} className="w-[82vw] shrink-0 snap-start sm:w-[58vw] md:w-[42vw] xl:w-auto">
           <Column def={def} tasks={byLane(def.lane)} />
         </div>
       ))}
