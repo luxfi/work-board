@@ -3,7 +3,7 @@ import { ORG, CHAIN_ID } from './config';
 import { useWorkspace } from './useWorkspace';
 import type { Source } from './useWorkspace';
 import { useRoute } from './router';
-import { Sidebar } from './components/Sidebar';
+import { IconRail, Sidebar } from './components/Sidebar';
 import { Topbar, Toolbar } from './components/chrome';
 import { Overview } from './components/Overview';
 import { SpaceView } from './components/Space';
@@ -12,7 +12,8 @@ import { Leaderboards } from './components/Leaderboards';
 import { Suggestions } from './components/Suggestions';
 import { Explore } from './components/Explore';
 import { TaskDetail } from './components/TaskDetail';
-import { PrimaryButton, IconMenu } from './ui';
+import { CommandPalette } from './components/CommandPalette';
+import { PrimaryButton, IconMenu, IconSearch } from './ui';
 import type { Task } from './types';
 import type { Workspace } from './chain';
 
@@ -93,14 +94,30 @@ export function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => setMenuOpen(false), [route.view, route.spaceKey, route.tab]);
 
+  // ⌘K / Ctrl-K toggles the command palette from anywhere; it also closes on nav.
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setPaletteOpen((v) => !v);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+  useEffect(() => setPaletteOpen(false), [route.view, route.spaceKey, route.tab, route.taskId]);
+
   return (
     <div className="flex h-full">
       {menuOpen && <div className="fixed inset-0 z-40 bg-black/60 md:hidden" onClick={() => setMenuOpen(false)} />}
+      {/* nav = 64px icon rail + 256px sidebar; static on desktop, off-canvas drawer on mobile */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 transition-transform duration-200 md:static md:z-auto md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex transition-transform duration-200 md:static md:z-auto md:translate-x-0 ${
           menuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
+        <IconRail onNavigate={() => setMenuOpen(false)} />
         <Sidebar onNavigate={() => setMenuOpen(false)} />
       </div>
 
@@ -119,14 +136,19 @@ export function App() {
             </span>
             {ORG.workspace}
           </span>
-          <a href={CONNECT_HREF} target="_blank" rel="noreferrer noopener" className="ml-auto">
-            <PrimaryButton>Connect</PrimaryButton>
-          </a>
+          <div className="ml-auto flex items-center gap-1">
+            <button onClick={() => setPaletteOpen(true)} className="flex h-11 w-11 items-center justify-center rounded-lg text-neutral-300 hover:bg-white/5" aria-label="Search">
+              <IconSearch className="h-5 w-5" />
+            </button>
+            <a href={CONNECT_HREF} target="_blank" rel="noreferrer noopener">
+              <PrimaryButton>Connect</PrimaryButton>
+            </a>
+          </div>
         </div>
 
         {/* desktop Connect / Follow */}
         <div className="hidden md:block">
-          <Topbar />
+          <Topbar onSearch={() => setPaletteOpen(true)} />
         </div>
 
         <div className="flex flex-1 flex-col">
@@ -135,6 +157,7 @@ export function App() {
       </main>
 
       {modalTask && ws && <TaskDetail task={modalTask} ws={ws} />}
+      {paletteOpen && <CommandPalette tasks={tasks} onClose={() => setPaletteOpen(false)} />}
       <StatusPill source={source} updatedAt={updatedAt} error={error} />
     </div>
   );
