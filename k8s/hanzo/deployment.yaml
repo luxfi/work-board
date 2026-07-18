@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: work-board
-  namespace: pars
+  namespace: hanzo-mainnet
   labels:
     app: work-board
 spec:
@@ -15,17 +15,17 @@ spec:
       labels:
         app: work-board
     spec:
-      # ghcr.io/luxfi is private; pull with a luxfi read credential (copied from
-      # the proven zoo-mainnet `ghcr-luxfi` secret). Same registry as the source
-      # repo — never mixed into another org.
+      # ghcr.io/luxfi is private; pull with the luxfi read credential (the same
+      # ghcr-luxfi secret proven on zoo-mainnet/pars, copied into hanzo-mainnet).
+      # Same registry as the source repo — never mixed into another org.
       imagePullSecrets:
         - name: ghcr-luxfi
       containers:
         - name: work-board
-          # Pinned to the immutable CI tag (ghcr.io/luxfi/work-board:pars-<sha>),
-          # built by docker.yml's `pars` matrix leg (VITE_BRAND=pars). CI builds
+          # Pinned to the immutable CI tag (ghcr.io/luxfi/work-board:hanzo-<sha>),
+          # built by docker.yml's `hanzo` matrix leg (VITE_BRAND=hanzo). CI builds
           # every push to main; bump this to roll a new build.
-          image: ghcr.io/luxfi/work-board:pars-259a22b
+          image: ghcr.io/luxfi/work-board:hanzo-259a22b
           ports:
             - containerPort: 3000
           resources:
