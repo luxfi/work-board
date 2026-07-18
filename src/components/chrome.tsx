@@ -1,13 +1,12 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { ORG } from '../config';
-import { PrimaryButton, GhostButton, IconSort, IconFilter, IconSearch } from '../ui';
+import { GhostButton, IconSort, IconFilter, IconSearch } from '../ui';
+import { ConnectButton } from './Connect';
 
-// Connect / Follow — top-right on every content view. Connect points at the org's
-// Hanzo IAM OIDC entry (wired by the CTO agent); until then it falls back to the
-// org's Discord so the button is never dead.
+// Connect / Follow — top-right on every content view. Connect resolves through the
+// org's Hanzo IAM tenant (Discord / GitHub / wallet) via the shared ConnectButton,
+// which shows the connected identity once signed in.
 export function Topbar({ onSearch }: { onSearch?: () => void }) {
-  const connectHref = ORG.iam?.authUrl ?? ORG.social.discord ?? ORG.social.website ?? '#';
   return (
     <div className="absolute right-6 top-5 z-10 flex flex-col items-end gap-2">
       <div className="flex items-center gap-2">
@@ -22,9 +21,7 @@ export function Topbar({ onSearch }: { onSearch?: () => void }) {
             <kbd className="rounded bg-white/8 px-1.5 py-0.5 text-[10px] text-neutral-500">⌘K</kbd>
           </button>
         )}
-        <a href={connectHref} target="_blank" rel="noreferrer noopener">
-          <PrimaryButton>Connect</PrimaryButton>
-        </a>
+        <ConnectButton />
       </div>
       <GhostButton>★ Follow</GhostButton>
     </div>

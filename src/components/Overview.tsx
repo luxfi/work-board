@@ -5,6 +5,7 @@ import type { Task } from '../types';
 import { rollupBySpace } from '../tasks';
 import { isZero, short, usdFromWei, formatDuration } from '../format';
 import { navigate } from '../router';
+import { iamConfig, loginOidc } from '../auth';
 import {
   AvatarStack,
   StatPill,
@@ -64,7 +65,11 @@ function OrgHeader({ ws }: { ws: Workspace }) {
 }
 
 function DiscordBanner() {
-  const href = ORG.iam?.discordUrl ?? ORG.social.discord ?? '#';
+  // "Connect with Discord" starts Discord OAuth through the brand's Hanzo IAM
+  // tenant when wired; until then it falls back to the org's Discord invite so
+  // the CTA is never dead.
+  const viaIam = iamConfig() !== null;
+  const btnCls = 'mt-3 inline-flex items-center gap-1.5 rounded-md bg-[#5865F2] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90';
   return (
     <div className="rounded-xl bg-indigo-500/8 p-4 ring-1 ring-inset ring-indigo-400/20">
       <div className="flex items-start gap-3">
@@ -79,9 +84,15 @@ function DiscordBanner() {
               <IconDiscord className="h-3.5 w-3.5 text-indigo-300" /> {ORG.workspace.toLowerCase()} member
             </span>
           </div>
-          <a href={href} target="_blank" rel="noreferrer noopener" className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-[#5865F2] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90">
-            <IconDiscord className="h-4 w-4" /> Connect with Discord
-          </a>
+          {viaIam ? (
+            <button onClick={() => loginOidc('discord')} className={btnCls}>
+              <IconDiscord className="h-4 w-4" /> Connect with Discord
+            </button>
+          ) : (
+            <a href={ORG.social.discord ?? '#'} target="_blank" rel="noreferrer noopener" className={btnCls}>
+              <IconDiscord className="h-4 w-4" /> Connect with Discord
+            </a>
+          )}
         </div>
       </div>
     </div>

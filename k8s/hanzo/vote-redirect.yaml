@@ -1,0 +1,51 @@
+# vote → work convergence: hanzo.vote  →  https://work.hanzo.network  (HTTP 301)
+#
+# Owner direction (2026-07): retire the *.vote Decent-fork shells; work.<org>.network
+# is the single canonical governance surface. hanzo.vote had TWO real defects (a
+# ~50% cold-load blank-#root white-screen, and a "Made with love by Lux" footer =
+# cross-brand white-label leak); the 301 replaces the shell before it can render, so
+# both defects become unreachable.
+#
+# hanzo-k8s routes public hosts via Traefik's @file provider
+# (--providers.file.directory=/etc/traefik/dynamic). The ingress-routes ConfigMap is
+# mounted there and the provider is directory-mode: each ConfigMap key is a merged
+# file (work.hanzo.network itself lives in the sibling key `work-board.yaml`). This
+# fragment is added as ConfigMap key `vote-redirect.yaml`; it is self-contained
+# (own middleware + router + sink service) so it never depends on cross-file refs.
+# priority 1000 wins over the operator-generated Ingress router for hanzo.vote, which
+# is deliberately LEFT IN PLACE (hanzo-domains App CR): that Ingress loads the valid
+# cert-manager TLS secret (CN=hanzo.vote) into Traefik's store, and this ingress's
+# ACME account is rate-limited (429) so certResolver cannot mint a fresh cert — the
+# store cert is what serves the handshake. The host is Cloudflare-proxied (Full).
+#
+# Apply (matches how work-board.yaml was applied — no file-watch on hanzo, so restart):
+#   R=k8s/hanzo/vote-redirect.yaml; C=do-sfo3-hanzo-k8s
+#   kubectl --context $C -n hanzo patch cm ingress-routes --type merge \
+#     -p "$(python3 -c 'import json;print(json.dumps({"data":{"vote-redirect.yaml":open("'$R'").read()}}))')"
+#   kubectl --context $C -n hanzo rollout restart deploy/ingress
+# INTERIM: the hanzo-vote shell Deployment is left running but is fully shadowed by
+# the 301 (both defects unreachable). Set hanzo-vote App CR replicas: 0 to retire it.
+http:
+  middlewares:
+    redirect-hanzo-vote-to-work:
+      redirectRegex:
+        permanent: true
+        regex: "^https?://(?:www\\.)?hanzo\\.vote/(.*)"
+        replacement: "https://work.hanzo.network/${1}"
+  routers:
+    hanzo-vote:
+      entryPoints:
+        - websecure
+      rule: Host(`hanzo.vote`) || Host(`www.hanzo.vote`)
+      priority: 1000
+      middlewares:
+        - redirect-hanzo-vote-to-work
+      service: vote-shell-sink
+      tls:
+        certResolver: letsencrypt
+  services:
+    vote-shell-sink:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: http://work-board.hanzo-mainnet.svc.cluster.local:80
