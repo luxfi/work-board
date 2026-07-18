@@ -18,7 +18,7 @@ export function Explore({ tasks }: { tasks: Task[] }) {
   const others = (Object.keys(BRANDS) as (keyof typeof BRANDS)[]).filter((k) => BRANDS[k].workspace !== ORG.workspace);
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-6">
+    <div className="mx-auto max-w-6xl px-4 py-5 md:px-6 md:py-6">
       <h1 className="text-2xl font-bold text-neutral-50">Explore bounties</h1>
       <p className="mt-1 text-sm text-neutral-400">Browse open work across every Space in {ORG.workspace}, and jump to sibling DAOs.</p>
 
@@ -60,7 +60,7 @@ export function Explore({ tasks }: { tasks: Task[] }) {
               href={`https://work.${k}.network`}
               target="_blank"
               rel="noreferrer noopener"
-              className="flex items-center gap-3 rounded-xl bg-[#1a1a1e] p-4 ring-1 ring-inset ring-white/6 hover:bg-[#202025]"
+              className="flex items-center gap-3 rounded-xl bg-[var(--surface)] p-4 ring-1 ring-inset ring-white/6 hover:bg-[var(--hover)]"
             >
               <span className="flex h-9 w-9 items-center justify-center rounded-lg text-sm font-bold text-white" style={{ backgroundColor: b.accent }}>
                 {b.workspace.charAt(0)}

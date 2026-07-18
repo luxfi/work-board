@@ -12,8 +12,11 @@ import { Leaderboards } from './components/Leaderboards';
 import { Suggestions } from './components/Suggestions';
 import { Explore } from './components/Explore';
 import { TaskDetail } from './components/TaskDetail';
+import { PrimaryButton, IconMenu } from './ui';
 import type { Task } from './types';
 import type { Workspace } from './chain';
+
+const CONNECT_HREF = ORG.iam?.authUrl ?? ORG.social.discord ?? ORG.social.website ?? '#';
 
 function StatusPill({ source, updatedAt, error }: { source: Source | null; updatedAt: number | null; error: string | null }) {
   if (source === null) return null;
@@ -42,8 +45,8 @@ function CombinedBoard({ tasks }: { tasks: Task[] }) {
   const [query, setQuery] = useState('');
   const shown = query ? tasks.filter((t) => t.title.toLowerCase().includes(query.toLowerCase())) : tasks;
   return (
-    <div className="px-8 py-6">
-      <div className="mb-5 flex items-center justify-between pr-32">
+    <div className="px-4 py-5 md:px-8 md:py-6">
+      <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between md:pr-32">
         <h1 className="text-2xl font-bold text-neutral-50">Combined Board</h1>
         <Toolbar query={query} onQuery={setQuery} />
       </div>
@@ -86,13 +89,51 @@ export function App() {
     [route.taskId, tasks],
   );
 
+  // Mobile: the sidebar is an off-canvas drawer. Close it on any route change.
+  const [menuOpen, setMenuOpen] = useState(false);
+  useEffect(() => setMenuOpen(false), [route.view, route.spaceKey, route.tab]);
+
   return (
     <div className="flex h-full">
-      <Sidebar />
-      <main className="relative flex-1 overflow-y-auto bg-[#0f0f11]">
-        <Topbar />
-        {loading && ws === null ? <Spinner /> : ws ? <Routed ws={ws} tasks={tasks} /> : null}
+      {menuOpen && <div className="fixed inset-0 z-40 bg-black/60 md:hidden" onClick={() => setMenuOpen(false)} />}
+      <div
+        className={`fixed inset-y-0 left-0 z-50 transition-transform duration-200 md:static md:z-auto md:translate-x-0 ${
+          menuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <Sidebar onNavigate={() => setMenuOpen(false)} />
+      </div>
+
+      <main className="relative flex min-w-0 flex-1 flex-col overflow-y-auto bg-[var(--bg)]">
+        {/* mobile top bar (hamburger + workspace + Connect) */}
+        <div
+          className="sticky top-0 z-30 flex items-center gap-2 border-b border-[var(--border)] bg-[var(--rail)]/95 px-3 py-2 backdrop-blur md:hidden"
+          style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.5rem)' }}
+        >
+          <button onClick={() => setMenuOpen(true)} className="flex h-11 w-11 items-center justify-center rounded-lg text-neutral-300 hover:bg-white/5" aria-label="Open menu">
+            <IconMenu className="h-5 w-5" />
+          </button>
+          <span className="flex items-center gap-2 font-semibold text-neutral-100">
+            <span className="flex h-6 w-6 items-center justify-center rounded-md text-xs font-bold text-white" style={{ backgroundColor: 'var(--brand)' }}>
+              {ORG.workspace.charAt(0)}
+            </span>
+            {ORG.workspace}
+          </span>
+          <a href={CONNECT_HREF} target="_blank" rel="noreferrer noopener" className="ml-auto">
+            <PrimaryButton>Connect</PrimaryButton>
+          </a>
+        </div>
+
+        {/* desktop Connect / Follow */}
+        <div className="hidden md:block">
+          <Topbar />
+        </div>
+
+        <div className="flex flex-1 flex-col">
+          {loading && ws === null ? <Spinner /> : ws ? <Routed ws={ws} tasks={tasks} /> : null}
+        </div>
       </main>
+
       {modalTask && ws && <TaskDetail task={modalTask} ws={ws} />}
       <StatusPill source={source} updatedAt={updatedAt} error={error} />
     </div>
