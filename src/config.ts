@@ -5,6 +5,11 @@ import { resolveBrand, resolveBrandKey } from './brands';
 
 const BRAND = resolveBrand(import.meta.env.VITE_BRAND);
 
+// The full resolved brand — the Dework views read presentation (tagline, accent,
+// socials, Spaces) off this. `ADDRESSES`, `CHAIN_ID` etc. below are convenience
+// aliases so the on-chain layer needn't reach through ORG.
+export const ORG = BRAND;
+
 export const BRAND_KEY = resolveBrandKey(import.meta.env.VITE_BRAND);
 
 export const CHAIN_ID = BRAND.chainId;
