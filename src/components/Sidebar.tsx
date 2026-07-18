@@ -3,7 +3,8 @@ import { ORG } from '../config';
 import { useRoute, navigate } from '../router';
 import type { Route } from '../router';
 import {
-  IconHome,
+  BrandMark,
+  BrandLogo,
   IconPlus,
   IconGrid,
   IconBulb,
@@ -14,6 +15,28 @@ import {
   IconMail,
   IconDoc,
 } from '../ui';
+
+// The far-left 64px icon rail — a SEPARATE column beside the 256px sidebar
+// (canonical Dework). Home + org-switcher "+". Both collapse into the mobile drawer.
+export function IconRail({ onNavigate }: { onNavigate?: () => void }) {
+  const go = (path: string) => {
+    navigate(path);
+    onNavigate?.();
+  };
+  return (
+    <div
+      className="flex h-full w-16 shrink-0 flex-col items-center gap-2 border-r border-[var(--border)] bg-[var(--rail)] pt-3"
+      style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}
+    >
+      <button onClick={() => go('/')} className="flex h-10 w-10 items-center justify-center" title="Home" aria-label={`${ORG.workspace} home`}>
+        <BrandMark size={40} className="shadow-sm" />
+      </button>
+      <button onClick={() => go('/explore')} className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 text-neutral-400 ring-1 ring-inset ring-white/8 hover:text-neutral-200" title="Browse bounties across all DAOs">
+        <IconPlus className="h-[18px] w-[18px]" />
+      </button>
+    </div>
+  );
+}
 
 function NavItem({
   active,
@@ -58,22 +81,9 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <aside className="flex h-full w-64 shrink-0 flex-col overflow-y-auto border-r border-[var(--border)] bg-[var(--rail)]">
-      {/* org switcher rail */}
-      <div className="flex items-center gap-2 px-3 pt-3" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
-        <button onClick={() => go('/')} style={{ backgroundColor: 'var(--brand)' }} className="flex h-9 w-9 items-center justify-center rounded-xl text-white shadow-sm" title="Home">
-          <IconHome className="h-[18px] w-[18px]" />
-        </button>
-        <button onClick={() => go('/explore')} className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-neutral-400 ring-1 ring-inset ring-white/8 hover:text-neutral-200" title="Browse bounties across all DAOs">
-          <IconPlus className="h-[18px] w-[18px]" />
-        </button>
-      </div>
-
       {/* workspace */}
-      <button onClick={() => go('/')} className="mx-3 mt-3 flex items-center gap-2.5 rounded-md px-1 py-1 text-left hover:bg-white/5">
-        <span className="flex h-7 w-7 items-center justify-center rounded-lg text-sm font-bold text-white" style={{ backgroundColor: 'var(--brand)' }}>
-          {ORG.workspace.charAt(0)}
-        </span>
-        <span className="flex-1 truncate text-sm font-semibold text-neutral-100">{ORG.workspace}</span>
+      <button onClick={() => go('/')} className="mx-3 mt-3 flex items-center gap-2.5 rounded-md px-1 py-1 text-left hover:bg-white/5" style={{ marginTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}>
+        <BrandLogo className="flex-1" />
         <IconChevronsLeft className="h-4 w-4 text-neutral-600" />
       </button>
 
