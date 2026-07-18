@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* @luxfi/ui ships its primitives as compiled classes in its dist — Tailwind must
+   scan them so the utilities the adopted Button / Input / Textarea emit exist. */
+@source "../node_modules/@luxfi/ui/dist";
+
 :root {
   color-scheme: dark;
   /* Dework dark palette — the one place the surface tokens live. */
@@ -10,8 +14,24 @@
   --border: #232328;
   --hover: #1e1e24;
   --muted: #8a8a93;
-  /* --brand is set per-org at runtime from brands.ts (App.tsx). */
+  /* --brand is set per-org at runtime from the @luxfi/ui LUX_BRAND value (App.tsx). */
   --brand: #6c5ce7;
+
+  /* @luxfi/ui adopted-primitive tokens, remapped onto the Dework palette + brand.
+     Only the tokens the adopted primitives read live here — the exchange
+     tokens.css is deliberately NOT imported wholesale, so no exchange palette
+     bleeds into the Dework surfaces. Static (non-brand-varying) except --brand. */
+  --color-button-solid-bg: var(--brand);
+  --color-button-solid-text: #ffffff;
+  --color-hover: color-mix(in srgb, var(--brand) 88%, #000000);
+  --color-button-subtle-bg: rgba(255, 255, 255, 0.05);
+  --color-button-subtle-fg: #e5e5e5;
+  --color-input-bg: transparent;
+  --color-input-fg: #e5e5e5;
+  --color-input-border: var(--border);
+  --color-input-border-hover: #3a3a42;
+  --color-input-border-focus: var(--brand);
+  --color-input-placeholder: var(--muted);
 }
 
 html,

@@ -7,6 +7,11 @@ import type { Reward } from './types';
 import { NATIVE_SYMBOL, ORG, BRAND_KEY } from './config';
 import { BRAND_LOGOS } from './brand-logos';
 
+// Text fields = @luxfi/ui primitives (native <input>/<textarea> under the hood,
+// bridging onChangeText<->onChange so keystrokes always round-trip). Re-exported
+// here so every view reaches text inputs through the one ../ui primitive surface.
+export { Input, Textarea } from '@luxfi/ui';
+
 // ---- Brand accent ----
 export const accent: CSSProperties = { backgroundColor: 'var(--brand)' };
 export const accentText: CSSProperties = { color: 'var(--brand)' };

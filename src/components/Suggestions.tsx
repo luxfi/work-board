@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ORG } from '../config';
-import { PrimaryButton, IconPlus, IconChevronDown, IconBulb, IconX } from '../ui';
+import { PrimaryButton, Input, Textarea, IconPlus, IconChevronDown, IconBulb, IconX } from '../ui';
 import { timeAgo } from '../format';
 
 // Community Suggestions — governance ideation. Persisted client-side (localStorage,
@@ -34,10 +34,11 @@ function NewSuggestionModal({ onClose, onCreate }: { onClose: () => void; onCrea
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 sm:items-start sm:px-4 sm:pt-28" onClick={onClose}>
       <div className="w-full max-w-2xl rounded-t-2xl bg-[var(--surface)] p-5 pb-8 shadow-2xl ring-1 ring-inset ring-white/10 sm:rounded-xl sm:pb-5" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between">
-          <input
+          <Input
+            variant="unstyled"
             autoFocus
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChangeText={setTitle}
             placeholder="Enter your suggestion here"
             className="w-full bg-transparent text-lg font-semibold text-neutral-100 placeholder:text-neutral-500 focus:outline-none"
           />
@@ -45,9 +46,10 @@ function NewSuggestionModal({ onClose, onCreate }: { onClose: () => void; onCrea
             <IconX className="h-4 w-4" />
           </button>
         </div>
-        <textarea
+        <Textarea
+          variant="unstyled"
           value={body}
-          onChange={(e) => setBody(e.target.value)}
+          onChangeText={setBody}
           placeholder='Add more details about your suggestion here. Type "/" to insert.'
           rows={4}
           className="mt-3 w-full resize-none bg-transparent text-sm text-neutral-300 placeholder:text-neutral-600 focus:outline-none"

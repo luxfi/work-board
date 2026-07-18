@@ -3,7 +3,7 @@ import type { Address } from 'viem';
 import type { Workspace } from '../chain';
 import type { Contributor } from '../types';
 import { formatAmount, short } from '../format';
-import { Avatar, IconSearch, IconTrophy } from '../ui';
+import { Avatar, Input, IconSearch, IconTrophy } from '../ui';
 
 type Window = 'all' | '30d' | '7d';
 
@@ -70,7 +70,7 @@ function Search({ placeholder }: { placeholder: string }) {
   return (
     <label className="flex items-center gap-1.5 rounded-md bg-white/5 px-2 py-1 text-xs text-neutral-400 ring-1 ring-inset ring-white/8">
       <IconSearch className="h-3.5 w-3.5" />
-      <input placeholder={placeholder} className="w-36 bg-transparent text-neutral-200 placeholder:text-neutral-600 focus:outline-none" />
+      <Input variant="unstyled" placeholder={placeholder} className="w-36 bg-transparent text-neutral-200 placeholder:text-neutral-600 focus:outline-none" />
     </label>
   );
 }
@@ -178,11 +178,11 @@ export function Leaderboards({ ws }: { ws: Workspace }) {
   const contributorRows = useMemo(() => base.filter((c) => c.completed > 0n), [base]);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-5 md:px-6 md:py-6">
+    <div className="mx-auto w-full max-w-6xl px-4 py-5 md:px-6 md:py-6">
       <h1 className="mb-5 text-2xl font-bold text-neutral-100">Leaderboards</h1>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <div className="min-w-0 rounded-xl bg-[var(--surface)] ring-1 ring-inset ring-white/6">
+        <div className="min-w-0 overflow-hidden rounded-xl bg-[var(--surface)] ring-1 ring-inset ring-white/6">
           <div className="flex flex-wrap items-center gap-3 px-4 py-3">
             <h2 className="text-sm font-semibold text-neutral-200">Top Contributors</h2>
             <WindowToggle value={win} onChange={setWin} />
@@ -193,7 +193,7 @@ export function Leaderboards({ ws }: { ws: Workspace }) {
           <ContributorTable rows={contributorRows} />
         </div>
 
-        <div className="min-w-0 rounded-xl bg-[var(--surface)] ring-1 ring-inset ring-white/6">
+        <div className="min-w-0 overflow-hidden rounded-xl bg-[var(--surface)] ring-1 ring-inset ring-white/6">
           <div className="flex flex-wrap items-center gap-3 px-4 py-3">
             <h2 className="text-sm font-semibold text-neutral-200">Top Reviewers</h2>
             <WindowToggle value={win} onChange={setWin} />
@@ -205,7 +205,7 @@ export function Leaderboards({ ws }: { ws: Workspace }) {
         </div>
       </div>
 
-      <div className="mt-6 min-w-0 rounded-xl bg-[var(--surface)] ring-1 ring-inset ring-white/6">
+      <div className="mt-6 min-w-0 overflow-hidden rounded-xl bg-[var(--surface)] ring-1 ring-inset ring-white/6">
         <div className="flex items-center justify-between px-4 py-3">
           <h2 className="text-sm font-semibold text-neutral-200">All Contributors</h2>
           <Search placeholder="Search contributors..." />
