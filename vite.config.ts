@@ -17,9 +17,15 @@ const RPC_TARGET = process.env.RPC_TARGET || 'http://127.0.0.1:9631';
 function brandHtml(): Plugin {
   const brand = resolveBrand(process.env.VITE_BRAND);
   const rpcOrigin = new URL(process.env.VITE_RPC_URL || brand.rpcUrl).origin;
+  // The board fetches the brand's Hanzo IAM tenant (OIDC token/userinfo + web3
+  // SIWE) — its origin must be in connect-src alongside the RPC host. The
+  // authorize redirect is a top-level navigation (not governed by connect-src).
+  // img-src also allows https: so an OIDC avatar (GitHub/Discord `picture`) renders.
+  const iamOrigin = brand.iam ? new URL(brand.iam.issuer).origin : '';
+  const connectSrc = ["'self'", rpcOrigin, iamOrigin].filter(Boolean).join(' ');
   const prod =
     "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; " +
-    `img-src 'self' data:; font-src 'self'; connect-src 'self' ${rpcOrigin}; ` +
+    `img-src 'self' data: https:; font-src 'self'; connect-src ${connectSrc}; ` +
     "base-uri 'self'; frame-ancestors 'none'; object-src 'none'";
   const dev =
     "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +

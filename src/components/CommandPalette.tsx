@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ORG } from '../config';
 import type { Task } from '../types';
 import { navigate, openTask } from '../router';
+import { openConnect } from '../auth';
 import { IconSearch, IconGrid, IconBoard, IconTrophy, IconBulb, IconPlus, IconDoc, IconExternal } from '../ui';
 
 // ⌘K command palette — global fuzzy search + quick-nav across views, spaces and
@@ -12,8 +13,6 @@ import { IconSearch, IconGrid, IconBoard, IconTrophy, IconBulb, IconPlus, IconDo
 const GROUPS = ['Actions', 'Navigate', 'Spaces', 'Tasks'] as const;
 type Group = (typeof GROUPS)[number];
 type Cmd = { id: string; label: string; hint?: string; group: Group; icon: React.ReactNode; run: () => void };
-
-const CONNECT_HREF = ORG.iam?.authUrl ?? ORG.social.discord ?? ORG.social.website ?? '#';
 
 // Subsequence fuzzy score: all query chars in order (case-insensitive). Lower is
 // better; -1 means no match. A prefix hit scores best, then a substring, then a
@@ -45,7 +44,7 @@ export function CommandPalette({ tasks, onClose }: { tasks: Task[]; onClose: () 
     };
     const base: Cmd[] = [
       { id: 'new', label: 'New Suggestion', group: 'Actions', icon: <IconPlus className="h-4 w-4" />, run: nav('/suggestions?new=1') },
-      { id: 'connect', label: `Connect to ${ORG.workspace}`, group: 'Actions', icon: <IconExternal className="h-4 w-4" />, run: () => { window.open(CONNECT_HREF, '_blank', 'noopener'); onClose(); } },
+      { id: 'connect', label: `Connect to ${ORG.workspace}`, group: 'Actions', icon: <IconExternal className="h-4 w-4" />, run: () => { openConnect(); onClose(); } },
       { id: 'overview', label: 'Overview', group: 'Navigate', icon: <IconGrid className="h-4 w-4" />, run: nav('/') },
       { id: 'board', label: 'Combined Board', group: 'Navigate', icon: <IconBoard className="h-4 w-4" />, run: nav('/board') },
       { id: 'leaderboards', label: 'Leaderboards', group: 'Navigate', icon: <IconTrophy className="h-4 w-4" />, run: nav('/leaderboards') },

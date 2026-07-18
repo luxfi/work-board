@@ -53,9 +53,15 @@ export type Brand = {
   social: { discord?: string; twitter?: string; website?: string };
   tags: string[]; // About-panel chips
   spaces: Space[];
-  // Hanzo IAM (OIDC) endpoints — Connect / Connect-with-Discord targets. Wired by
-  // the CTO agent; optional until then.
-  iam?: { authUrl: string; discordUrl: string };
+  // Hanzo IAM (OIDC) — the brand's identity tenant. `issuer` is the per-brand host
+  // (lux.id / pars.id / hanzo.id / zoo.id); IAM resolves the org from that host and
+  // white-labels the login page. `clientId` is the `<org>-work` public SPA client
+  // (authorization-code + PKCE, no secret). Discord / GitHub / Phantom / WalletConnect
+  // all resolve through this ONE tenant (see src/auth.ts). Optional
+  // walletConnectProjectId enables the WalletConnect method (needs an upstream
+  // WalletConnect Cloud projectId in KMS). Unset ⇒ the Connect surface falls back to
+  // socials, so a control is never dead.
+  iam?: { issuer: string; clientId: string; walletConnectProjectId?: string };
   // Canonical public RPC. Baked into the bundle at build time (also the source of
   // the CSP connect-src host). Overridable per-build via VITE_RPC_URL.
   rpcUrl: string;
@@ -90,6 +96,11 @@ export const BRANDS = {
       { key: 'content', name: 'Content Creation', emoji: '🎬', skills: ['Writing', 'Design'] },
       { key: 'governance', name: 'Governance', emoji: '🏛️', skills: ['Legal', 'Operations'], match: ['zips/'] },
     ],
+    // NOTE: zoo.id has no DNS yet — pending an A record → the hanzo-k8s LB
+    // (129.212.164.5, same as lux.id/pars.id) + the zoo org's domain set to zoo.id
+    // in IAM so its authorize/token resolve to zoo.id (today id.zoo.network leaks
+    // authorize→hanzo.id). Until then Connect degrades to socials for Zoo.
+    iam: { issuer: 'https://zoo.id', clientId: 'zoo-work' },
     rpcUrl: 'https://api.zoo.network/v1/bc/C/rpc',
   },
   pars: {
@@ -119,6 +130,7 @@ export const BRANDS = {
       { key: 'education', name: 'Education & Research', emoji: '📚', skills: ['Education', 'Research'] },
       { key: 'governance', name: 'Governance', emoji: '🏛️', skills: ['Legal', 'Operations'], match: ['pips/'] },
     ],
+    iam: { issuer: 'https://pars.id', clientId: 'pars-work' },
     rpcUrl: 'https://api.pars.network/v1/bc/C/rpc',
   },
   lux: {
@@ -148,6 +160,7 @@ export const BRANDS = {
       { key: 'research', name: 'Research', emoji: '🔬', skills: ['Research', 'Cryptography'] },
       { key: 'governance', name: 'Governance', emoji: '🏛️', skills: ['Legal', 'Operations'] },
     ],
+    iam: { issuer: 'https://lux.id', clientId: 'lux-work' },
     rpcUrl: 'https://api.lux.network/v1/bc/C/rpc',
   },
   hanzo: {
@@ -177,6 +190,7 @@ export const BRANDS = {
       { key: 'content', name: 'Content Creation', emoji: '🎬', skills: ['Writing', 'Design'] },
       { key: 'governance', name: 'Governance', emoji: '🏛️', skills: ['Legal', 'Operations'] },
     ],
+    iam: { issuer: 'https://hanzo.id', clientId: 'hanzo-work' },
     rpcUrl: 'https://api.hanzo.network/v1/bc/C/rpc',
   },
 } as const satisfies Record<string, Brand>;
