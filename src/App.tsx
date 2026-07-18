@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ORG, CHAIN_ID } from './config';
+import { LUX_BRAND } from '@luxfi/ui';
+import { ORG, CHAIN_ID, BRAND_KEY } from './config';
 import { useWorkspace } from './useWorkspace';
 import type { Source } from './useWorkspace';
 import { useRoute } from './router';
@@ -80,8 +81,10 @@ export function App() {
   const route = useRoute();
 
   // Inject the per-brand accent once; every accented element reads var(--brand).
+  // Sourced from the @luxfi/ui LUX_BRAND value (dark_${BRAND_KEY} row) so brand
+  // is one value in one place — identical hex to the legacy brands.ts accent.
   useEffect(() => {
-    document.documentElement.style.setProperty('--brand', ORG.accent);
+    document.documentElement.style.setProperty('--brand', LUX_BRAND[BRAND_KEY]);
   }, []);
 
   const modalTask = useMemo(
@@ -148,7 +151,7 @@ export function App() {
           <Topbar onSearch={() => setPaletteOpen(true)} />
         </div>
 
-        <div className="flex flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col">
           {loading && ws === null ? <Spinner /> : ws ? <Routed ws={ws} tasks={tasks} /> : null}
         </div>
       </main>

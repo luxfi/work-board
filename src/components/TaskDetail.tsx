@@ -10,6 +10,7 @@ import { closeTask } from '../router';
 import { short, isZero, absDate, timeAgo, refToLink, formatAmount } from '../format';
 import {
   Avatar,
+  Input,
   SkillTag,
   RewardBadge,
   OpenToBadge,
@@ -221,9 +222,10 @@ export function TaskDetail({ task, ws }: { task: Task; ws: Workspace }) {
                 ))}
 
                 <div className="mt-1 flex items-center gap-2">
-                  <input
+                  <Input
+                    variant="unstyled"
                     value={draft}
-                    onChange={(e) => setDraft(e.target.value)}
+                    onChangeText={setDraft}
                     onKeyDown={(e) => e.key === 'Enter' && addComment()}
                     placeholder="Add a comment or application…"
                     className="flex-1 rounded-md bg-white/5 px-3 py-2 text-sm text-neutral-200 placeholder:text-neutral-600 ring-1 ring-inset ring-white/8 focus:outline-none"
