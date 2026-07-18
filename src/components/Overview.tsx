@@ -3,7 +3,6 @@ import { ORG } from '../config';
 import type { Workspace } from '../chain';
 import type { Task } from '../types';
 import { rollupBySpace } from '../tasks';
-import { skillMeta } from '../skills';
 import { isZero, short, usdFromWei, formatDuration } from '../format';
 import { navigate } from '../router';
 import {
@@ -89,27 +88,26 @@ function DiscordBanner() {
   );
 }
 
+// peaq-style category card: emoji tile + name + "N open tasks · N contributors".
+// Uniform structure so a grid of them reads as one symmetrical block.
+const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? '' : 's'}`;
+
 function SpaceCard({ space, rollup }: { space: Space; rollup: SpaceRollup }) {
   return (
     <button
       onClick={() => navigate(`/space/${space.key}/board`)}
-      className="flex flex-col gap-4 rounded-xl bg-[var(--surface)] p-4 text-left ring-1 ring-inset ring-white/6 transition-colors hover:bg-[var(--hover)]"
+      className="flex items-start gap-3 rounded-xl bg-[var(--surface)] p-4 text-left ring-1 ring-inset ring-white/6 transition-colors hover:bg-[var(--hover)]"
     >
-      <div className="flex items-center gap-2">
-        <span className="text-xl leading-none">{space.emoji}</span>
-        <span className="text-sm font-semibold text-neutral-100">{space.name}</span>
-      </div>
-      <div className="flex items-center gap-1.5">
-        {space.skills.map((s) => (
-          <span key={s} className="text-sm" title={s}>
-            {skillMeta(s).emoji}
-          </span>
-        ))}
-      </div>
-      <div className="flex items-center gap-3 text-xs text-neutral-500">
-        <span className="tabular-nums">{rollup.open} open tasks</span>
-        <span>·</span>
-        <span className="tabular-nums">{rollup.contributors} contributors</span>
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white/5 text-2xl leading-none ring-1 ring-inset ring-white/8" aria-hidden>
+        {space.emoji}
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-sm font-semibold text-neutral-100">{space.name}</div>
+        <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-neutral-500">
+          <span className="tabular-nums">{plural(rollup.open, 'open task')}</span>
+          <span aria-hidden>·</span>
+          <span className="tabular-nums">{plural(rollup.contributors, 'contributor')}</span>
+        </div>
       </div>
     </button>
   );
@@ -188,7 +186,7 @@ export function Overview({ ws, tasks }: { ws: Workspace; tasks: Task[] }) {
           <DiscordBanner />
 
           <h2 className="mb-3 mt-7 text-lg font-semibold text-neutral-100">Bounties</h2>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {bountySpaces.map((s) => (
               <SpaceCard key={s.key} space={s} rollup={rollups.get(s.key) ?? empty} />
             ))}
@@ -197,7 +195,7 @@ export function Overview({ ws, tasks }: { ws: Workspace; tasks: Task[] }) {
           {projectSpaces.length > 0 && (
             <>
               <h2 className="mb-3 mt-7 text-lg font-semibold text-neutral-100">Projects based bounties</h2>
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {projectSpaces.map((s) => (
                   <SpaceCard key={s.key} space={s} rollup={rollups.get(s.key) ?? empty} />
                 ))}
