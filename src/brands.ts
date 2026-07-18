@@ -1,18 +1,7 @@
 import type { Address } from 'viem';
-
-// Brand logos — embedded at build time. Vite inlines these small SVGs as `data:`
-// URIs (well under the 4 KB asset-inline limit), which the strict production CSP
-// permits via `img-src 'self' data:`; a missing file fails the build. Each mark is
-// the brand's own canonical asset (from its @<org>/brand package or app public/),
-// never cross-brand: a Zoo build embeds only Zoo. `logo` is the full wordmark,
-// `logoMark` the square/icon mark. Zoo ships one trigram that serves as both.
-import zooWordmark from './assets/brands/zoo/wordmark.svg';
-import parsWordmark from './assets/brands/pars/wordmark.svg';
-import parsMark from './assets/brands/pars/mark.svg';
-import luxWordmark from './assets/brands/lux/wordmark.svg';
-import luxMark from './assets/brands/lux/mark.svg';
-import hanzoWordmark from './assets/brands/hanzo/wordmark.svg';
-import hanzoMark from './assets/brands/hanzo/mark.svg';
+// NOTE: brand logo .svg imports live in ./brand-logos.ts, NOT here. vite.config.ts
+// imports this module for the build-time title/CSP, and the config bundler can't
+// parse .svg imports (it reads the SVG markup as JSX). Keep brands.ts asset-free.
 
 // The one place a white-label lives. A brand is selected at BUILD time by the
 // VITE_BRAND build-arg (see Dockerfile / docker.yml); default is 'zoo'. Every
@@ -60,10 +49,6 @@ export type Brand = {
   accent: string;
   // Optional secondary/highlight hex (e.g. Pars gold). Omit for single-accent brands.
   accentSecondary?: string;
-  // Brand logos — embedded SVGs (imported → build-inlined `data:` URI string).
-  // `logo` is the full wordmark; `logoMark` the square/icon mark. Never cross-brand.
-  logo: string;
-  logoMark: string;
   usdPerNative: number; // native → USD for the "Total paid: $X" header stat
   social: { discord?: string; twitter?: string; website?: string };
   tags: string[]; // About-panel chips
@@ -94,8 +79,6 @@ export const BRANDS = {
     workspace: 'Zoo',
     tagline: 'Open AI research network — DeAI & DeSci',
     accent: '#6c5efb',
-    logo: zooWordmark,
-    logoMark: zooWordmark,
     usdPerNative: 1,
     social: { discord: 'https://discord.gg/zoo', twitter: 'https://twitter.com/zoo_labs', website: 'https://zoo.ngo' },
     tags: ['DeAI', 'DeSci', 'Research', 'Open Source', 'AI'],
@@ -125,8 +108,6 @@ export const BRANDS = {
     tagline: 'The community L1',
     accent: '#1C3879',
     accentSecondary: '#D4AF37',
-    logo: parsWordmark,
-    logoMark: parsMark,
     usdPerNative: 1,
     social: { website: 'https://pars.network' },
     tags: ['Community', 'L1', 'Governance'],
@@ -156,8 +137,6 @@ export const BRANDS = {
     workspace: 'Lux',
     tagline: 'Quantum-safe multi-consensus L1',
     accent: '#7000FF',
-    logo: luxWordmark,
-    logoMark: luxMark,
     usdPerNative: 1,
     social: { discord: 'https://discord.gg/lux', twitter: 'https://x.com/luxfi', website: 'https://lux.network' },
     tags: ['Consensus', 'Post-Quantum', 'L1', 'DeFi', 'Open Source'],
@@ -187,8 +166,6 @@ export const BRANDS = {
     workspace: 'Hanzo',
     tagline: 'Frontier AI & foundational models',
     accent: '#ea580c',
-    logo: hanzoWordmark,
-    logoMark: hanzoMark,
     usdPerNative: 1,
     social: { discord: 'https://discord.gg/hanzo', website: 'https://hanzo.ai' },
     tags: ['AI', 'LLM', 'MCP', 'Agents', 'Open Source'],

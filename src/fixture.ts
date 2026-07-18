@@ -51,6 +51,10 @@ const FIXTURES: Record<BrandKey, BountyView[]> = {
       reputation: { completed: 1n, earned: 200000000000000n },
     },
   ],
+  // lux + hanzo: work-market staged (not yet deployed) → no live bounty #0 to mirror.
+  // Empty until their contracts land; the UI shows an empty board offline, not another chain's data.
+  lux: [],
+  hanzo: [],
 };
 
 export const FIXTURE: BountyView[] = FIXTURES[BRAND_KEY];
