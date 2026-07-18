@@ -1,0 +1,33 @@
+# Traefik (hanzoai/ingress) route for work.lux.network.
+#
+# lux-k8s's public ingress (lux-system/hanzo-ingress DaemonSet, LB 134.199.138.27)
+# routes via the kubernetescrd provider — a Traefik IngressRoute CRD (group
+# hanzo.ai/v1alpha1) — NOT the @file provider that zoo/pars use, and NOT a
+# Kubernetes Ingress. api.lux.network is served exactly this way
+# (lux-mainnet/api-mainnet). This is still hanzoai/ingress (Traefik); it is the
+# provider this cluster's public ingress actually reads.
+#
+# TLS: Traefik's built-in ACME resolver (certResolver: letsencrypt). The host is
+# Cloudflare-proxied (orange; A 134.199.138.27, zone in Full mode) exactly like
+# api.lux.network, so the edge presents Cloudflare Universal SSL for *.lux.network.
+#
+# Apply:  kubectl --context do-sfo3-lux-k8s apply -f k8s/lux/route.yaml
+apiVersion: hanzo.ai/v1alpha1
+kind: IngressRoute
+metadata:
+  name: work-mainnet
+  namespace: lux-mainnet
+  labels:
+    app: work-board
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`work.lux.network`)
+      services:
+        - name: work-board
+          port: 80
+          passHostHeader: true
+  tls:
+    certResolver: letsencrypt

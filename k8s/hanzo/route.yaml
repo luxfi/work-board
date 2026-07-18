@@ -1,0 +1,32 @@
+# Traefik (hanzoai/ingress) @file route for work.hanzo.network.
+#
+# hanzo-k8s routes public hosts via Traefik's @file provider
+# (--providers.file.directory=/etc/traefik/dynamic, ConfigMap hanzo/ingress-routes
+# key routes.yaml) — exactly how api.hanzo.network is served (router
+# api-hanzo-network -> service hanzod-rpc). TLS auto-issued by Traefik's built-in
+# ACME resolver (certResolver: letsencrypt) via Cloudflare DNS-01. The host is
+# grey (A 129.212.164.5, direct to the ingress LB) like api.hanzo.network.
+#
+# Merge into hanzo/ingress-routes — adds exactly two keys, leaves every existing
+# router/service untouched:
+#   R=/tmp/hanzo-routes.yaml; C=do-sfo3-hanzo-k8s
+#   kubectl --context $C -n hanzo get cm ingress-routes -o jsonpath='{.data.routes\.yaml}' > $R
+#   yq -i '.http.routers.work-hanzo-network = {"entryPoints":["websecure"],"rule":"Host(`work.hanzo.network`)","service":"work-board","tls":{"certResolver":"letsencrypt"}}
+#          | .http.services.work-board = {"loadBalancer":{"passHostHeader":true,"servers":[{"url":"http://work-board.hanzo-mainnet.svc.cluster.local:80"}]}}' $R
+#   kubectl --context $C -n hanzo patch cm ingress-routes --type merge -p "$(jq -n --rawfile r $R '{data:{"routes.yaml":$r}}')"
+# Traefik (--providers.file.watch=true) hot-reloads within ~60s and issues the cert.
+http:
+  routers:
+    work-hanzo-network:
+      entryPoints:
+        - websecure
+      rule: Host(`work.hanzo.network`)
+      service: work-board
+      tls:
+        certResolver: letsencrypt
+  services:
+    work-board:
+      loadBalancer:
+        passHostHeader: true
+        servers:
+          - url: http://work-board.hanzo-mainnet.svc.cluster.local:80
