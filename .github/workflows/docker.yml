@@ -7,10 +7,14 @@ name: Docker
 # One Dockerfile, one workflow, one registry (ghcr.io/luxfi — the source org, so
 # images are never mixed into another org's namespace). The brand matrix stamps
 # each white-label from the same source via the VITE_BRAND build-arg:
-#   zoo  -> ghcr.io/luxfi/work-board:sha-<sha>   (work.zoo.network)
-#   pars -> ghcr.io/luxfi/work-board:pars-<sha>  (work.pars.network)
+#   zoo   -> ghcr.io/luxfi/work-board:sha-<sha>    (work.zoo.network)
+#   pars  -> ghcr.io/luxfi/work-board:pars-<sha>   (work.pars.network)
+#   lux   -> ghcr.io/luxfi/work-board:lux-<sha>    (work.lux.network)
+#   hanzo -> ghcr.io/luxfi/work-board:hanzo-<sha>  (work.hanzo.network)
 # The zoo leg resolves exactly as before (VITE_BRAND defaults to zoo), so its
-# image is unchanged.
+# image is unchanged. Each brand is a fully independent white-label build — the
+# VITE_BRAND arg selects the profile in src/brands.ts and VITE_RPC_URL bakes the
+# brand's live CORS-enabled RPC into the bundle; no cross-brand leak is possible.
 #
 # NOTE: the org-canonical reusable `hanzoai/.github/.../docker-build.yml@main`
 # is NOT usable from luxfi: hanzoai/.github is a PRIVATE repo and both orgs are
@@ -44,6 +48,12 @@ jobs:
           - brand: pars
             prefix: pars-
             rpc: https://api.pars.network/v1/bc/C/rpc
+          - brand: lux
+            prefix: lux-
+            rpc: https://api.lux.network/v1/bc/C/rpc
+          - brand: hanzo
+            prefix: hanzo-
+            rpc: https://api.hanzo.network/v1/bc/C/rpc
     steps:
       - uses: actions/checkout@v4
 
