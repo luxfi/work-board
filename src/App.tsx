@@ -13,11 +13,10 @@ import { Suggestions } from './components/Suggestions';
 import { Explore } from './components/Explore';
 import { TaskDetail } from './components/TaskDetail';
 import { CommandPalette } from './components/CommandPalette';
-import { PrimaryButton, IconMenu, IconSearch } from './ui';
+import { ConnectButton, ConnectSheetHost } from './components/Connect';
+import { IconMenu, IconSearch } from './ui';
 import type { Task } from './types';
 import type { Workspace } from './chain';
-
-const CONNECT_HREF = ORG.iam?.authUrl ?? ORG.social.discord ?? ORG.social.website ?? '#';
 
 function StatusPill({ source, updatedAt, error }: { source: Source | null; updatedAt: number | null; error: string | null }) {
   if (source === null) return null;
@@ -140,9 +139,7 @@ export function App() {
             <button onClick={() => setPaletteOpen(true)} className="flex h-11 w-11 items-center justify-center rounded-lg text-neutral-300 hover:bg-white/5" aria-label="Search">
               <IconSearch className="h-5 w-5" />
             </button>
-            <a href={CONNECT_HREF} target="_blank" rel="noreferrer noopener">
-              <PrimaryButton>Connect</PrimaryButton>
-            </a>
+            <ConnectButton />
           </div>
         </div>
 
@@ -158,6 +155,7 @@ export function App() {
 
       {modalTask && ws && <TaskDetail task={modalTask} ws={ws} />}
       {paletteOpen && <CommandPalette tasks={tasks} onClose={() => setPaletteOpen(false)} />}
+      <ConnectSheetHost />
       <StatusPill source={source} updatedAt={updatedAt} error={error} />
     </div>
   );
