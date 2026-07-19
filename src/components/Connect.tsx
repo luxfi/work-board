@@ -37,7 +37,7 @@ function methods(): Method[] {
   const list: Method[] = [
     { id: 'github', label: 'Continue with GitHub', hint: 'Bounties are GitHub-tied', icon: <IconGithub className="h-5 w-5" />, run: () => loginOidc('github') },
     { id: 'discord', label: 'Continue with Discord', hint: 'Roles & private Spaces', icon: <IconDiscord className="h-5 w-5 text-[#5865F2]" />, run: () => loginOidc('discord') },
-    { id: 'phantom', label: 'Connect Phantom', hint: 'Sign in with your wallet', icon: <IconWallet className="h-5 w-5 text-[#ab9ff2]" />, run: () => loginWallet('phantom') },
+    { id: 'injected', label: 'Browser Wallet', hint: 'MetaMask · Rabby · Phantom', icon: <IconWallet className="h-5 w-5 text-[#ab9ff2]" />, run: () => loginWallet('injected') },
   ];
   if (i.walletConnectProjectId) {
     list.push({ id: 'walletconnect', label: 'WalletConnect', hint: 'Any WC-compatible wallet', icon: <IconWallet className="h-5 w-5 text-sky-400" />, run: () => loginWallet('walletconnect') });
