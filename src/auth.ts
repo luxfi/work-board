@@ -10,7 +10,7 @@ import { short } from './format';
 //   • Discord / GitHub — OAuth2 authorization-code + PKCE (public SPA client, no
 //     secret): a full-page redirect to the brand IAM `/oauth/authorize`, back to
 //     `/auth/callback` with a `code`.
-//   • Phantom / WalletConnect — SIWE (EIP-4361) signed against an IAM-minted
+//   • Injected wallet / WalletConnect — SIWE (EIP-4361) signed against an IAM-minted
 //     `web3/nonce`, POSTed to `web3/verify`, which binds the wallet to an IAM
 //     identity (WalletLink) and returns the SAME authorization `code`.
 // `exchangeCode` then swaps the code for tokens (PKCE, no secret) + userinfo and
@@ -26,8 +26,8 @@ declare global {
   }
 }
 
-export type AuthMethod = 'github' | 'discord' | 'phantom' | 'walletconnect';
-export type WalletKind = 'phantom' | 'walletconnect';
+export type AuthMethod = 'github' | 'discord' | 'injected' | 'walletconnect';
+export type WalletKind = 'injected' | 'walletconnect';
 
 export type Session = {
   method: AuthMethod;
@@ -198,11 +198,13 @@ export async function loginOidc(method: 'github' | 'discord'): Promise<void> {
   window.location.href = `${endpoints(i).authorize}?${q}`;
 }
 
-// ---- Wallet: Phantom / WalletConnect (SIWE → web3/verify → code) ----
+// ---- Wallet: injected EIP-1193 / WalletConnect (SIWE → web3/verify → code) ----
 async function eip1193(kind: WalletKind): Promise<Eip1193> {
-  if (kind === 'phantom') {
-    const p = window.phantom?.ethereum ?? (window.ethereum?.isPhantom ? window.ethereum : undefined);
-    if (!p) throw new Error('Phantom wallet not found — install the Phantom extension.');
+  if (kind === 'injected') {
+    // Any injected browser wallet: MetaMask, Rabby, Coinbase, Phantom (multichain), … .
+    // `eth_requestAccounts` opens the wallet's own connect prompt.
+    const p = window.ethereum ?? window.phantom?.ethereum;
+    if (!p) throw new Error('No browser wallet found — install MetaMask, Rabby, or another Web3 wallet.');
     return p;
   }
   // WalletConnect needs an upstream projectId (see brands.ts iam.walletConnectProjectId)
