@@ -113,7 +113,7 @@ function SpaceCard({ space, rollup }: { space: Space; rollup: SpaceRollup }) {
         {space.emoji}
       </span>
       <div className="min-w-0 flex-1">
-        <div className="truncate text-sm font-semibold text-neutral-100">{space.name}</div>
+        <div className="text-sm font-semibold leading-snug text-neutral-100">{space.name}</div>
         <div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-neutral-500">
           <span className="tabular-nums">{plural(rollup.open, 'open task')}</span>
           <span aria-hidden>·</span>

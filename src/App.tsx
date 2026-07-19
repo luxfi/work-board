@@ -19,11 +19,17 @@ import { IconMenu, IconSearch } from './ui';
 import type { Task } from './types';
 import type { Workspace } from './chain';
 
+// The LIVE/FIXTURE data-source pill (and the raw RPC error it surfaces) is a
+// developer diagnostic, never production chrome — a production visitor must never
+// see "FIXTURE" or an RPC error string. Gated to `vite dev`; force it on in a
+// prod-like build for debugging with VITE_SHOW_STATUS=true.
+const SHOW_STATUS = import.meta.env.DEV || import.meta.env.VITE_SHOW_STATUS === 'true';
+
 function StatusPill({ source, updatedAt, error }: { source: Source | null; updatedAt: number | null; error: string | null }) {
   if (source === null) return null;
   const live = source === 'live';
   return (
-    <div className="fixed bottom-3 left-3 z-40 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-[11px] text-neutral-400 ring-1 ring-inset ring-white/10 backdrop-blur">
+    <div className="fixed bottom-3 left-3 z-40 flex max-w-[calc(100vw-1.5rem)] items-center gap-1.5 overflow-hidden rounded-full bg-black/60 px-2.5 py-1 text-[11px] text-neutral-400 ring-1 ring-inset ring-white/10 backdrop-blur">
       <span className={`h-1.5 w-1.5 rounded-full ${live ? 'animate-pulse bg-emerald-400' : 'bg-amber-400'}`} />
       <span className={live ? 'text-emerald-300' : 'text-amber-300'}>{live ? 'LIVE' : 'FIXTURE'}</span>
       <span className="text-neutral-600">· chain {CHAIN_ID}</span>
@@ -159,7 +165,7 @@ export function App() {
       {modalTask && ws && <TaskDetail task={modalTask} ws={ws} />}
       {paletteOpen && <CommandPalette tasks={tasks} onClose={() => setPaletteOpen(false)} />}
       <ConnectSheetHost />
-      <StatusPill source={source} updatedAt={updatedAt} error={error} />
+      {SHOW_STATUS && <StatusPill source={source} updatedAt={updatedAt} error={error} />}
     </div>
   );
 }
