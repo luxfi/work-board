@@ -25,7 +25,7 @@ spec:
           # Pinned to the immutable CI tag (ghcr.io/luxfi/work-board:hanzo-<sha>),
           # built by docker.yml's `hanzo` matrix leg (VITE_BRAND=hanzo). CI builds
           # every push to main; bump this to roll a new build.
-          image: ghcr.io/luxfi/work-board:hanzo-259a22b
+          image: ghcr.io/luxfi/work-board:hanzo-34afd2d
           ports:
             - containerPort: 3000
           resources:
