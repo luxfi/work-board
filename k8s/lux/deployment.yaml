@@ -25,7 +25,7 @@ spec:
           # Pinned to the immutable CI tag (ghcr.io/luxfi/work-board:lux-<sha>),
           # built by docker.yml's `lux` matrix leg (VITE_BRAND=lux). CI builds
           # every push to main; bump this to roll a new build.
-          image: ghcr.io/luxfi/work-board:lux-259a22b
+          image: ghcr.io/luxfi/work-board:lux-34afd2d
           ports:
             - containerPort: 3000
           resources:
