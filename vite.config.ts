@@ -1,7 +1,9 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { defineConfig, type Plugin, type IndexHtmlTransformContext } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-import { resolveBrand, brandTitle } from './src/brands';
+import { resolveBrand, resolveBrandKey, brandTitle } from './src/brands';
 
 // Dev proxy target. Defaults to the kubectl port-forward; override to read a
 // remote node, e.g. `RPC_TARGET=https://api.pars.network npm run dev`.
@@ -17,6 +19,16 @@ const RPC_TARGET = process.env.RPC_TARGET || 'http://127.0.0.1:9631';
 // CSP can never drift from the endpoint the board calls.
 function brandHtml(): Plugin {
   const brand = resolveBrand(process.env.VITE_BRAND);
+  const brandKey = resolveBrandKey(process.env.VITE_BRAND);
+  // Favicon = the brand's own square mark, inlined as a data: URI so it needs no
+  // separate request and satisfies the strict CSP (img-src 'self' data:). Kept as
+  // a purpose-built 16px-legible favicon.svg per brand (never the generic
+  // placeholder, never cross-brand).
+  const faviconSvg = readFileSync(
+    fileURLToPath(new URL(`./src/assets/brands/${brandKey}/favicon.svg`, import.meta.url)),
+    'utf8',
+  );
+  const faviconHref = `data:image/svg+xml,${encodeURIComponent(faviconSvg)}`;
   const rpcOrigin = new URL(process.env.VITE_RPC_URL || brand.rpcUrl).origin;
   // The board fetches the brand's Hanzo IAM tenant (OIDC token/userinfo + web3
   // SIWE) — its origin must be in connect-src alongside the RPC host. The
@@ -38,6 +50,7 @@ function brandHtml(): Plugin {
       const policy = ctx.server ? dev : prod;
       return html
         .replace(/<title>[^<]*<\/title>/, `<title>${brandTitle(brand)}</title>`)
+        .replace(/<link rel="icon"[^>]*>/, `<link rel="icon" type="image/svg+xml" href="${faviconHref}" />`)
         .replace(
           '</title>',
           `</title>\n    <meta http-equiv="Content-Security-Policy" content="${policy}" />`,
