@@ -5,11 +5,13 @@
 # brand RPC directly (access-control-allow-origin: * verified on the brand host).
 FROM node:22-alpine AS build
 WORKDIR /app
-COPY package.json package-lock.json ./
-# `npm install` (not `npm ci`): TypeScript 7 and Rollup 4 ship platform-specific PREBUILT
-# binaries as optionalDependencies, and a darwin-generated lock omits the linux-musl variants
-# (npm prunes non-current-platform optional deps). `install` resolves the correct ones on the
-# linux build host. Same non-frozen approach the dao-vote image uses (pnpm --no-frozen-lockfile).
+# Copy ONLY package.json (not the lock) and resolve fresh on the linux-musl build host.
+# Vite 8 (Rolldown) and TypeScript 7 ship platform-specific PREBUILT native bindings as
+# optionalDependencies; a committed darwin-generated lock omits the linux-musl variants and
+# npm bug #4828 then refuses to add them even on `npm install` — Rolldown fails with
+# "Cannot find module @rolldown/binding-linux-x64-musl". A fresh, lock-free install resolves the
+# correct platform bindings. Same non-frozen spirit as the dao-vote image (pnpm --no-frozen-lockfile).
+COPY package.json ./
 RUN npm install --no-audit --no-fund
 COPY . .
 ARG VITE_BRAND=zoo
