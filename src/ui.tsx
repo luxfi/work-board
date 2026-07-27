@@ -1,4 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react';
+// Used inside this file. The full set is re-exported under the Icon* names below.
+import { Coins as IconCoins, DollarSign as IconDollar, Image as IconImage } from '@luxfi/ui/icons';
 import { addrGradient, avatarText, tokenLabel } from './format';
 import { skillMeta } from './skills';
 import { formatReward } from './reward';
@@ -120,7 +122,7 @@ export function RewardBadge({ reward, meta, size = 'sm' }: { reward: Reward; met
         d.image ? (
           <img src={d.image} alt="" className="h-4 w-4 rounded object-cover ring-1 ring-white/10" />
         ) : (
-          <span aria-hidden>🖼️</span>
+          <IconImage className="h-4 w-4 text-neutral-400" aria-hidden />
         )
       ) : (
         <IconCoins className="h-3.5 w-3.5 text-emerald-400" />
@@ -180,52 +182,55 @@ export function StatPill({ icon, children }: { icon: ReactNode; children: ReactN
   );
 }
 
-// ---- Icons (inline SVG, stroke=currentColor) ----
-type IconProps = { className?: string };
-const S = 'none';
-function svg(path: ReactNode, vb = '0 0 24 24') {
-  return function Icon({ className = 'h-4 w-4' }: IconProps) {
-    return (
-      <svg viewBox={vb} fill={S} stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
-        {path}
-      </svg>
-    );
-  };
-}
+// ---- Icons ----
+//
+// One Lux icon set: Lucide, as @hanzo/gui standardises on it, re-exported by
+// @luxfi/ui/icons. What was here was a second set — ~37 glyphs hand-drawn
+// inline at strokeWidth 1.7 (Lucide is 2), with IconHalfCircle painting a
+// filled half-disc over an outline circle, so an "in progress" chip was duotone
+// on a board where nothing else was. Names are unchanged, so no view moved.
+//
+// The three brand marks below stay hand-drawn: a logo is not a UI glyph, and no
+// icon set is allowed to redraw someone's mark.
+export {
+  House as IconHome,
+  Plus as IconPlus,
+  LayoutGrid as IconGrid,
+  Lightbulb as IconBulb,
+  Trophy as IconTrophy,
+  Kanban as IconBoard,
+  List as IconList,
+  Clock as IconClock,
+  DollarSign as IconDollar,
+  Link as IconLink,
+  Search as IconSearch,
+  ArrowUpDown as IconSort,
+  Filter as IconFilter,
+  CircleCheck as IconCheckCircle,
+  Circle as IconCircle,
+  CircleDashed as IconHalfCircle,
+  Lock as IconLock,
+  Bookmark as IconBookmark,
+  ChevronDown as IconChevronDown,
+  ChevronRight as IconChevronRight,
+  ChevronsLeft as IconChevronsLeft,
+  Info as IconInfo,
+  X as IconX,
+  Menu as IconMenu,
+  Ellipsis as IconDots,
+  ExternalLink as IconExternal,
+  CircleHelp as IconQuestion,
+  Mail as IconMail,
+  FileText as IconDoc,
+  Coins as IconCoins,
+  UserPlus as IconUsersPlus,
+  Zap as IconBolt,
+  ShieldCheck as IconShield,
+  Wallet as IconWallet,
+} from '@luxfi/ui/icons';
 
-export const IconHome = svg(<path d="M3 11.5 12 4l9 7.5M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9" />);
-export const IconPlus = svg(<path d="M12 5v14M5 12h14" />);
-export const IconGrid = svg(<><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>);
-export const IconBulb = svg(<><path d="M9 18h6M10 21h4" /><path d="M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.3 1 2.5h6c0-1.2.3-1.8 1-2.5A6 6 0 0 0 12 3Z" /></>);
-export const IconTrophy = svg(<><path d="M7 4h10v4a5 5 0 0 1-10 0V4Z" /><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M9 21h6M10 17v4M14 17v4" /></>);
-export const IconBoard = svg(<><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M9 4v16M15 4v16" /></>);
-export const IconList = svg(<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />);
-export const IconClock = svg(<><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>);
-export const IconDollar = svg(<><path d="M12 2v20M17 6.5C17 4.6 14.8 3.5 12 3.5S7 4.6 7 6.5 9.2 9.5 12 9.5s5 1.1 5 3-2.2 3-5 3-5-1.1-5-3" /></>);
-export const IconLink = svg(<><path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1" /><path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1" /></>);
-export const IconSearch = svg(<><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></>);
-export const IconSort = svg(<path d="M7 4v16M7 20l-3-3M7 4l3 3M17 20V4M17 4l-3 3M17 4l3 3" />);
-export const IconFilter = svg(<path d="M4 5h16l-6 7v6l-4 2v-8L4 5Z" />);
-export const IconCheckCircle = svg(<><circle cx="12" cy="12" r="9" /><path d="m8.5 12 2.5 2.5 4.5-5" /></>);
-export const IconCircle = svg(<circle cx="12" cy="12" r="8.5" />);
-export const IconHalfCircle = svg(<><circle cx="12" cy="12" r="8.5" /><path d="M12 3.5a8.5 8.5 0 0 1 0 17Z" fill="currentColor" stroke="none" /></>);
-export const IconLock = svg(<><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></>);
-export const IconBookmark = svg(<path d="M6 4h12v16l-6-4-6 4V4Z" />);
-export const IconChevronDown = svg(<path d="m6 9 6 6 6-6" />);
-export const IconChevronRight = svg(<path d="m9 6 6 6-6 6" />);
-export const IconChevronsLeft = svg(<path d="m11 7-5 5 5 5M18 7l-5 5 5 5" />);
-export const IconInfo = svg(<><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></>);
-export const IconX = svg(<path d="M6 6l12 12M18 6 6 18" />);
-export const IconMenu = svg(<path d="M4 6h16M4 12h16M4 18h16" />);
-export const IconDots = svg(<path d="M5 12h.01M12 12h.01M19 12h.01" />);
-export const IconExternal = svg(<><path d="M14 4h6v6" /><path d="M20 4 10 14" /><path d="M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5" /></>);
-export const IconQuestion = svg(<><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .8-1 1.7M12 17h.01" /></>);
-export const IconMail = svg(<><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></>);
-export const IconDoc = svg(<><path d="M6 3h8l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" /><path d="M14 3v4h4" /></>);
-export const IconCoins = svg(<><ellipse cx="9" cy="7" rx="6" ry="3" /><path d="M3 7v5c0 1.7 2.7 3 6 3s6-1.3 6-3" /><path d="M15 11c2.8.2 6 1.4 6 3.5S17.4 18 15 18M9 15v2c0 1.7 2.7 3 6 3" /></>);
-export const IconUsersPlus = svg(<><circle cx="9" cy="8" r="3.2" /><path d="M3.5 20c0-3 2.5-5 5.5-5s5.5 2 5.5 5M18 8v6M15 11h6" /></>);
-export const IconBolt = svg(<path d="M13 3 5 14h6l-1 7 8-11h-6l1-7Z" />);
-export const IconShield = svg(<><path d="M12 3 5 6v5c0 4.5 3 8 7 9 4-1 7-4.5 7-9V6l-7-3Z" /><path d="m9 12 2 2 4-4" /></>);
+type IconProps = { className?: string };
+
 export const IconDiscord = ({ className = 'h-4 w-4' }: IconProps) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
     <path d="M20 5.3A18 18 0 0 0 15.6 4l-.3.5A13 13 0 0 1 12 4a13 13 0 0 1-3.3.5L8.4 4A18 18 0 0 0 4 5.3C1.7 8.7 1.1 12 1.4 15.3A18 18 0 0 0 6.9 18l.7-1c-.6-.2-1.2-.5-1.7-.9l.4-.3a12.7 12.7 0 0 0 11.4 0l.4.3c-.5.4-1.1.7-1.7.9l.7 1a18 18 0 0 0 5.5-2.7c.4-3.8-.6-7.1-2.7-10ZM8.7 13.5c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.6.8 1.6 1.8-.7 1.8-1.6 1.8Zm6.6 0c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.6.8 1.6 1.8-.7 1.8-1.6 1.8Z" />
@@ -241,4 +246,3 @@ export const IconGithub = ({ className = 'h-4 w-4' }: IconProps) => (
     <path d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49l-.01-1.9c-2.78.62-3.37-1.2-3.37-1.2-.45-1.19-1.11-1.5-1.11-1.5-.91-.64.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.35 1.12 2.92.85.09-.66.35-1.12.63-1.37-2.22-.26-4.55-1.14-4.55-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.72 0 0 .84-.28 2.75 1.05a9.4 9.4 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.42.2 2.46.1 2.72.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.79-4.57 5.05.36.32.68.94.68 1.9l-.01 2.82c0 .27.18.6.69.49A10.26 10.26 0 0 0 22 12.25C22 6.58 17.52 2 12 2Z" />
   </svg>
 );
-export const IconWallet = svg(<><rect x="3" y="6" width="18" height="13" rx="2.5" /><path d="M3 10h18M16.5 14.5h.01" /></>);
