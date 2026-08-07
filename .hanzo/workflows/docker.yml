@@ -37,7 +37,7 @@ jobs:
     # lux-build-amd64: in-cluster ARC scale-set (lux-k8s, amd64 DOKS, DinD).
     # amd64-only — the deploy targets (zoo-k8s, pars-k8s) are amd64; a static SPA
     # needs no arm64.
-    runs-on: lux-build-amd64
+    runs-on: [lux-build-linux-amd64]
     strategy:
       fail-fast: false
       matrix:
@@ -47,7 +47,7 @@ jobs:
             rpc: https://api.zoo.network/v1/bc/C/rpc
           - brand: pars
             prefix: pars-
-            rpc: https://api.pars.network/v1/bc/C/rpc
+            rpc: https://api.pars.network/ext/bc/C/rpc
           - brand: lux
             prefix: lux-
             rpc: https://api.lux.network/v1/bc/C/rpc
@@ -68,9 +68,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
+          username: ${{ secrets.GHCR_USER }}
+          password: ${{ secrets.GHCR_TOKEN }}
       - name: Image metadata
         id: meta
         uses: docker/metadata-action@v5
