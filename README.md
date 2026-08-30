@@ -32,7 +32,7 @@ Point the dev proxy at any node instead of the local port-forward, and select a
 brand:
 
     RPC_TARGET=https://api.pars.network npm run dev
-    VITE_BRAND=pars VITE_RPC_URL=https://api.pars.network/v1/bc/C/rpc npm run build
+    VITE_BRAND=pars VITE_RPC_URL=https://api.pars.network/v1/chain/C/rpc npm run build
 
 If the RPC is unreachable, the board renders a faithful fixture of that brand's
 live bounty #0 (behind the same render path) so the UI stays verifiable; the
