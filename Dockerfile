@@ -16,7 +16,7 @@ RUN npm install --no-audit --no-fund
 COPY . .
 ARG VITE_BRAND=zoo
 ENV VITE_BRAND=$VITE_BRAND
-ARG VITE_RPC_URL=https://api.zoo.network/v1/bc/C/rpc
+ARG VITE_RPC_URL=https://api.zoo.network/v1/chain/C/rpc
 ENV VITE_RPC_URL=$VITE_RPC_URL
 # Build the artifact with Vite directly (esbuild transpiles TS — no tsc). The `npm run build`
 # script also runs `tsc --noEmit`, but the TypeScript 7 NATIVE compiler has no alpine/musl binary,

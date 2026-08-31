@@ -114,7 +114,7 @@ export default defineConfig(({ mode }) => ({
       '/rpc': {
         target: RPC_TARGET,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/rpc/, '/v1/bc/C/rpc'),
+        rewrite: (path) => path.replace(/^\/rpc/, '/v1/chain/C/rpc'),
       },
     },
   },

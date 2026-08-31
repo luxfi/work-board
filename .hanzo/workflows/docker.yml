@@ -44,16 +44,16 @@ jobs:
         include:
           - brand: zoo
             prefix: sha-
-            rpc: https://api.zoo.network/v1/bc/C/rpc
+            rpc: https://api.zoo.network/v1/chain/C/rpc
           - brand: pars
             prefix: pars-
             rpc: https://api.pars.network/ext/bc/C/rpc
           - brand: lux
             prefix: lux-
-            rpc: https://api.lux.network/v1/bc/C/rpc
+            rpc: https://api.lux.network/v1/chain/C/rpc
           - brand: hanzo
             prefix: hanzo-
-            rpc: https://api.hanzo.network/v1/bc/C/rpc
+            rpc: https://api.hanzo.network/v1/chain/C/rpc
     steps:
       - uses: actions/checkout@v4
 
