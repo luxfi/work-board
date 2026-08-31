@@ -101,7 +101,7 @@ export const BRANDS = {
     // in IAM so its authorize/token resolve to zoo.id (today id.zoo.network leaks
     // authorize→hanzo.id). Until then Connect degrades to socials for Zoo.
     iam: { issuer: 'https://zoo.id', clientId: 'zoo-work' },
-    rpcUrl: 'https://api.zoo.network/v1/bc/C/rpc',
+    rpcUrl: 'https://api.zoo.network/v1/chain/C/rpc',
   },
   pars: {
     chainId: 494949,
@@ -133,7 +133,7 @@ export const BRANDS = {
       { key: 'governance', name: 'Governance', emoji: '🏛️', skills: ['Legal', 'Operations'], match: ['pips/'] },
     ],
     iam: { issuer: 'https://pars.id', clientId: 'pars-work' },
-    rpcUrl: 'https://api.pars.network/v1/bc/C/rpc',
+    rpcUrl: 'https://api.pars.network/v1/chain/C/rpc',
   },
   lux: {
     chainId: 96369,
@@ -163,7 +163,7 @@ export const BRANDS = {
       { key: 'governance', name: 'Governance', emoji: '🏛️', skills: ['Legal', 'Operations'] },
     ],
     iam: { issuer: 'https://lux.id', clientId: 'lux-work' },
-    rpcUrl: 'https://api.lux.network/v1/bc/C/rpc',
+    rpcUrl: 'https://api.lux.network/v1/chain/C/rpc',
   },
   hanzo: {
     chainId: 36963,
@@ -193,7 +193,7 @@ export const BRANDS = {
       { key: 'governance', name: 'Governance', emoji: '🏛️', skills: ['Legal', 'Operations'] },
     ],
     iam: { issuer: 'https://hanzo.id', clientId: 'hanzo-work' },
-    rpcUrl: 'https://api.hanzo.network/v1/bc/C/rpc',
+    rpcUrl: 'https://api.hanzo.network/v1/chain/C/rpc',
   },
 } as const satisfies Record<string, Brand>;
 
