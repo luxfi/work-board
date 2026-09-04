@@ -2,12 +2,12 @@ import { useEffect, useState } from 'react';
 import { ORG } from '../config';
 import type { Workspace } from '../chain';
 import { loadNftMeta } from '../chain';
-import type { NftMeta } from '../reward';
-import { isNft } from '../reward';
+import type { NftMeta } from '../asset';
+import { format as formatAsset, isNft, reward, stake } from '../asset';
 import type { Task, Activity, ActivityKind } from '../types';
-import { STATE_TITLE, State, RewardType } from '../types';
+import { STATE_TITLE, State, AssetKind } from '../types';
 import { closeTask } from '../router';
-import { short, isZero, absDate, timeAgo, refToLink, formatAmount } from '../format';
+import { short, isZero, absDate, timeAgo, refToLink, formatAmount, tokenLabel } from '../format';
 import {
   Avatar,
   Input,
@@ -34,7 +34,8 @@ const VERB: Record<ActivityKind, string> = {
   disputed: 'opened a dispute',
   resolved: 'resolved the dispute',
   cancelled: 'cancelled the bounty',
-  slashed: 'stake slashed',
+  slashed: 'had their stake slashed',
+  recovered: 'recovered the uncollected reward',
   finalized: 'finalized the task',
 };
 
@@ -66,11 +67,12 @@ export function TaskDetail({ task, ws }: { task: Task; ws: Workspace }) {
   const [draft, setDraft] = useState('');
   const [dismissed, setDismissed] = useState(false);
 
+  const rewardAsset = reward(task);
+  const stakeAsset = stake(task);
+
   useEffect(() => {
-    if (isNft(task.parsedReward) && (task.parsedReward.type === RewardType.ERC721 || task.parsedReward.type === RewardType.ERC1155)) {
-      const r = task.parsedReward;
-      void loadNftMeta(r.token, r.tokenId, r.type === RewardType.ERC1155).then(setMeta);
-    }
+    if (isNft(rewardAsset))
+      void loadNftMeta(rewardAsset.token, rewardAsset.tokenId, rewardAsset.kind === AssetKind.ERC1155).then(setMeta);
   }, [task.id]);
 
   useEffect(() => {
@@ -127,7 +129,7 @@ export function TaskDetail({ task, ws }: { task: Task; ws: Workspace }) {
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-1.5">
               {task.openTo && <OpenToBadge openTo={task.openTo} />}
-              <RewardBadge reward={task.parsedReward} meta={meta} />
+              <RewardBadge reward={rewardAsset} meta={meta} />
               {task.skills.map((s) => (
                 <SkillTag key={s} skill={s} />
               ))}
@@ -156,9 +158,16 @@ export function TaskDetail({ task, ws }: { task: Task; ws: Workspace }) {
             {/* description — the on-chain facts + the linked off-chain spec (issueRef) */}
             <div className="mt-5 border-l-2 border-white/10 pl-4 text-sm leading-relaxed text-neutral-300">
               <p className="text-neutral-400">
-                On-chain bounty <span className="font-mono text-neutral-300">#{task.id}</span> on {ORG.chainName} · escrowed reward{' '}
-                <span className="text-emerald-300">{formatAmount(task.reward)} {task.token === '0x0000000000000000000000000000000000000000' ? ORG.nativeSymbol : short(task.token)}</span>
-                {task.stake > 0n && <> · claim stake <span className="text-neutral-200">{formatAmount(task.stake)}</span></>}.
+                On-chain bounty <span className="font-mono text-neutral-300">#{task.id}</span> on {ORG.chainName} ·{' '}
+                {task.rewardCreditedAmount > 0n ? 'escrowed reward' : 'reward, not yet escrowed'}{' '}
+                <span className="text-emerald-300">{formatAsset(rewardAsset, ORG.nativeSymbol, tokenLabel, meta).primary}</span>
+                {stakeAsset.amount > 0n && (
+                  <>
+                    {' '}· claim stake{' '}
+                    <span className="text-neutral-200">{formatAsset(stakeAsset, ORG.nativeSymbol, tokenLabel).primary}</span>
+                  </>
+                )}
+                .
               </p>
               {issue && (
                 <p className="mt-2">

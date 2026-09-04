@@ -26,6 +26,7 @@ and the RPC host baked into the CSP — from `src/brands.ts`:
     npm install
     npm run dev        # http://localhost:5173  (proxies /rpc -> 127.0.0.1:9631 port-forward)
     npm run build      # tsc --noEmit && vite build  ->  dist/
+    npm test           # vitest run
     npm run preview     # serve the production build
 
 Point the dev proxy at any node instead of the local port-forward, and select a
@@ -64,24 +65,35 @@ header in each `route.yaml`).
 
 ## Data source
 
+The live set, as recorded in `lps/LPs/lp-0020-work-market.md` and read by
+`src/brands.ts`. The V1 addresses this table used to carry predate the split of
+the reward asset from the stake asset and answer a different struct.
+
 **Zoo 200200**
 
 | Contract     | Address                                      |
 | ------------ | -------------------------------------------- |
-| Bounty     | `0x3EDb4a0104614b4aC12D5babCE984291aE8BE8E7` |
-| Escrow     | `0x095E68282aea751Cc70A2Be565270f1B6AB0229C` |
-| Reputation | `0xed976852e8c2b1283e4F475845046B679224460D` |
+| Bounty     | `0x857c9fE5A644e048FEF7194Da10fFEb356a81fFD` |
+| Escrow     | `0x5d9a3A8c1EeEfaC85178c5583425Ab25C0C208b3` |
+| Reputation | `0xE6766AF6171F437D6d3952e73402b762718c1809` |
+| Karma      | `0xA8898F8573a463C167584979dc7E2cD43c24BAdF` |
 | owner        | `0x229599f227231d8C90fcF1a78589F5DC4b7A6962` (Zoo DAO Safe) |
 
 **Pars 494949**
 
 | Contract     | Address                                      |
 | ------------ | -------------------------------------------- |
-| Bounty     | `0x316B41c886c7D4B4e38cBB08a243776Ed977cf1F` |
-| Escrow     | `0xD5890D32d603a04E35ec7dBAbDCD0CA400f07E92` |
-| Reputation | `0x155d1363c23467929FB709FCFa0afC51F3497aB6` |
+| Bounty     | `0x79254D4A9286FBd65E7177440Be20f00934c33c2` |
+| Escrow     | `0x82323cf625C3a6DE0f5fB75A2e7bD41BB8200075` |
+| Reputation | `0xD7fe65BCb3Efd85AC1E132E8b74365498E034f13` |
+| Karma      | `0x81fBD8287571E83D2a834Ae5A8B859092C45b2EA` |
 | owner        | `0x4CEA4ac1C874a340B06e0422E77a477463C3a542` (Pars DAO Safe) |
 
-`bountyCount()` + `bounties(i)` give the current struct; `BountyProposed` /
-`WorkSubmitted` logs give `issueRef` / `deliverableRef`; `Reputation.completedOf` /
-`earnedOf` give the worker's score. ABIs are copied into `src/abi.ts` (no cross-repo import).
+`bountyCount()` + `bounties(i)` give the current struct — eighteen fields, with
+the reward asset (`rewardKind` / `rewardToken` / `rewardTokenId` / `reward`) and
+the stake asset (`stakeToken` / `stake`) recorded apart, so a reward can be an
+NFT while the worker's stake stays fungible. The twelve lifecycle events give the
+activity log, `BountyProposed` / `WorkSubmitted` give `issueRef` /
+`deliverableRef`, and `Reputation.completedOf` / `earnedOf` give the worker's
+score. ABIs are copied into `src/abi.ts` from the Foundry artifact (no cross-repo
+import) and `src/abi.test.ts` pins the tuple order against it.

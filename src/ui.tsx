@@ -1,11 +1,11 @@
 import type { CSSProperties, ReactNode } from 'react';
 // Used inside this file. The full set is re-exported under the Icon* names below.
-import { Coins as IconCoins, DollarSign as IconDollar, Image as IconImage } from '@luxfi/ui/icons';
+import { Coins as IconCoins, DollarSign as IconDollar, Image as IconImage, ShieldCheck as IconShield } from '@luxfi/ui/icons';
 import { addrGradient, avatarText, tokenLabel } from './format';
 import { skillMeta } from './skills';
-import { formatReward } from './reward';
-import type { NftMeta } from './reward';
-import type { Reward } from './types';
+import { format as formatAsset } from './asset';
+import type { NftMeta } from './asset';
+import type { Asset } from './types';
 import { NATIVE_SYMBOL, ORG, BRAND_KEY } from './config';
 import { BRAND_LOGOS } from './brand-logos';
 
@@ -112,12 +112,14 @@ export function SkillTag({ skill, compact = false }: { skill: string; compact?: 
   );
 }
 
-// ---- Reward badge (native / ERC-20 / NFT) ----
-export function RewardBadge({ reward, meta, size = 'sm' }: { reward: Reward; meta?: NftMeta; size?: 'sm' | 'lg' }) {
-  const d = formatReward(reward, NATIVE_SYMBOL, tokenLabel, meta);
+// ---- Reward badge (native / ERC-20 / ERC-721 / ERC-1155) ----
+// What the funder put up. The bounty records the kind, so an NFT reward renders
+// as a named token rather than as an amount of a token that has no amount.
+export function RewardBadge({ reward, meta, size = 'sm' }: { reward: Asset; meta?: NftMeta; size?: 'sm' | 'lg' }) {
+  const d = formatAsset(reward, NATIVE_SYMBOL, tokenLabel, meta);
   const big = size === 'lg';
   return (
-    <span className={`inline-flex items-center gap-1.5 ${big ? 'text-base' : 'text-xs'}`}>
+    <span className={`inline-flex items-center gap-1.5 ${big ? 'text-base' : 'text-xs'}`} title={d.secondary}>
       {d.isNft ? (
         d.image ? (
           <img src={d.image} alt="" className="h-4 w-4 rounded object-cover ring-1 ring-white/10" />
@@ -128,6 +130,24 @@ export function RewardBadge({ reward, meta, size = 'sm' }: { reward: Reward; met
         <IconCoins className="h-3.5 w-3.5 text-emerald-400" />
       )}
       <span className={`font-semibold tabular-nums ${d.isNft ? 'text-fuchsia-200' : 'text-emerald-300'}`}>{d.primary}</span>
+    </span>
+  );
+}
+
+// ---- Stake badge ----
+// What the worker puts up to claim. The escrow holds it in its own asset, which
+// need not be the reward's, so it is read and rendered separately. A bounty that
+// asks for no stake renders nothing.
+export function StakeBadge({ stake }: { stake: Asset }) {
+  if (stake.amount === 0n) return null;
+  const d = formatAsset(stake, NATIVE_SYMBOL, tokenLabel);
+  return (
+    <span
+      className="inline-flex items-center gap-1 text-xs text-neutral-400"
+      title={d.secondary ? `Claim stake · ${d.secondary}` : 'Claim stake'}
+    >
+      <IconShield className="h-3.5 w-3.5 text-neutral-500" aria-hidden />
+      <span className="tabular-nums">{d.primary}</span>
     </span>
   );
 }
