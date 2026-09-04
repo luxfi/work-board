@@ -12,6 +12,16 @@ export const bountyAbi = [
     stateMutability: 'view',
   },
   {
+    // Eighteen components, in the artifact's order. Every one is a static type,
+    // so a tuple of the wrong length decodes without reverting: it reads that
+    // many words off the front and calls them whatever this list says. Read one
+    // field out of step and rewardKind is reported as the reward token, and
+    // every address after it moves up a slot — a board that looks populated and
+    // credits the wrong people.
+    //
+    // The reward asset and the stake asset are recorded apart, and they are not
+    // the same kind of thing: a reward may be an NFT while the worker's stake
+    // stays fungible, so neither reads off a single `token` field.
     type: 'function',
     name: 'bounties',
     inputs: [{ name: 'bountyId_', type: 'uint256' }],
@@ -21,18 +31,23 @@ export const bountyAbi = [
         type: 'tuple',
         components: [
           { name: 'state', type: 'uint8' },
-          { name: 'token', type: 'address' },
+          { name: 'rewardKind', type: 'uint8' },
+          { name: 'rewardToken', type: 'address' },
+          { name: 'rewardTokenId', type: 'uint256' },
+          { name: 'reward', type: 'uint256' },
+          { name: 'stakeToken', type: 'address' },
+          { name: 'stake', type: 'uint256' },
           { name: 'funder', type: 'address' },
           { name: 'approver', type: 'address' },
           { name: 'arbiter', type: 'address' },
           { name: 'worker', type: 'address' },
-          { name: 'reward', type: 'uint256' },
-          { name: 'stake', type: 'uint256' },
           { name: 'claimDeadline', type: 'uint64' },
           { name: 'claimWindow', type: 'uint64' },
           { name: 'claimNonce', type: 'uint64' },
           { name: 'reviewWindow', type: 'uint64' },
           { name: 'reviewDeadline', type: 'uint64' },
+          { name: 'rewardCreditedAmount', type: 'uint256' },
+          { name: 'settledAt', type: 'uint64' },
         ],
       },
     ],
@@ -41,6 +56,10 @@ export const bountyAbi = [
 ] as const;
 
 // ---- Events (assemble refs, activity log, stats and reviewer counts) ----
+//
+// Twelve, which is the whole lifecycle: propose, fund, claim, submit, accept,
+// pay, cancel, dispute, resolve, finalize, slash, recover. chain.ts reads all
+// twelve, so the activity log has no silent gaps.
 
 export const bountyProposedEvent = {
   type: 'event',
@@ -50,8 +69,11 @@ export const bountyProposedEvent = {
     { name: 'bountyId', type: 'uint256', indexed: true },
     { name: 'funder', type: 'address', indexed: true },
     { name: 'approver', type: 'address', indexed: true },
-    { name: 'token', type: 'address', indexed: false },
+    { name: 'rewardKind', type: 'uint8', indexed: false },
+    { name: 'rewardToken', type: 'address', indexed: false },
+    { name: 'rewardTokenId', type: 'uint256', indexed: false },
     { name: 'reward', type: 'uint256', indexed: false },
+    { name: 'stakeToken', type: 'address', indexed: false },
     { name: 'stake', type: 'uint256', indexed: false },
     { name: 'issueRef', type: 'string', indexed: false },
   ],
@@ -64,7 +86,7 @@ export const bountyFundedEvent = {
   inputs: [
     { name: 'bountyId', type: 'uint256', indexed: true },
     { name: 'funder', type: 'address', indexed: true },
-    { name: 'amount', type: 'uint256', indexed: false },
+    { name: 'reward', type: 'uint256', indexed: false },
   ],
 } as const;
 
@@ -121,7 +143,7 @@ export const bountyCancelledEvent = {
   inputs: [
     { name: 'bountyId', type: 'uint256', indexed: true },
     { name: 'funder', type: 'address', indexed: true },
-    { name: 'amount', type: 'uint256', indexed: false },
+    { name: 'reward', type: 'uint256', indexed: false },
   ],
 } as const;
 
@@ -136,6 +158,20 @@ export const bountyDisputedEvent = {
   ],
 } as const;
 
+// The arbiter splits the escrowed reward between the two sides; the amounts sum
+// to what was escrowed, so either can be zero.
+export const disputeResolvedEvent = {
+  type: 'event',
+  name: 'DisputeResolved',
+  anonymous: false,
+  inputs: [
+    { name: 'bountyId', type: 'uint256', indexed: true },
+    { name: 'arbiter', type: 'address', indexed: true },
+    { name: 'workerAmount', type: 'uint256', indexed: false },
+    { name: 'funderAmount', type: 'uint256', indexed: false },
+  ],
+} as const;
+
 export const bountyFinalizedEvent = {
   type: 'event',
   name: 'BountyFinalized',
@@ -147,7 +183,36 @@ export const bountyFinalizedEvent = {
   ],
 } as const;
 
+// The worker's stake, taken and sent elsewhere: the cost of a claim abandoned
+// or a dispute lost.
+export const stakeSlashedEvent = {
+  type: 'event',
+  name: 'StakeSlashed',
+  anonymous: false,
+  inputs: [
+    { name: 'bountyId', type: 'uint256', indexed: true },
+    { name: 'worker', type: 'address', indexed: true },
+    { name: 'to', type: 'address', indexed: true },
+    { name: 'amount', type: 'uint256', indexed: false },
+  ],
+} as const;
+
+// A reward that was never collected, returned to the funder once the recovery
+// window has passed.
+export const rewardRecoveredEvent = {
+  type: 'event',
+  name: 'RewardRecovered',
+  anonymous: false,
+  inputs: [
+    { name: 'bountyId', type: 'uint256', indexed: true },
+    { name: 'funder', type: 'address', indexed: true },
+    { name: 'worker', type: 'address', indexed: true },
+    { name: 'amount', type: 'uint256', indexed: false },
+  ],
+} as const;
+
 // ---- Reputation (per-DAO worker ledger) ----
+// The counts are uint64: a tally of finished work, not a token balance.
 export const reputationAbi = [
   {
     type: 'function',

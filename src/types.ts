@@ -14,25 +14,29 @@ export enum State {
   Cancelled = 8,
 }
 
-// The current bounties(i) struct, decoded. `rewardType`/`tokenId` are optional:
-// Bounty has neither (every reward is native/ERC-20). the finished Bounty (CTO agent) adds
-// them; chain.ts populates them when present so the reward model is future-proof.
+// The bounties(i) struct, decoded — eighteen fields, in the order the contract
+// writes them (src/abi.ts pins that order against the artifact). The reward
+// asset and the stake asset are separate records: a reward may be an NFT while
+// the worker's stake stays fungible.
 export type Bounty = {
   state: number;
-  token: Address;
+  rewardKind: number; // AssetKind
+  rewardToken: Address;
+  rewardTokenId: bigint;
+  reward: bigint;
+  stakeToken: Address;
+  stake: bigint;
   funder: Address;
   approver: Address;
   arbiter: Address;
   worker: Address;
-  reward: bigint;
-  stake: bigint;
   claimDeadline: bigint;
   claimWindow: bigint;
   claimNonce: bigint;
   reviewWindow: bigint;
   reviewDeadline: bigint;
-  rewardType?: number; // RewardType; undefined => infer from token (native/erc20)
-  tokenId?: bigint; // ERC-721/1155 token id
+  rewardCreditedAmount: bigint; // what the escrow actually holds against the reward
+  settledAt: bigint; // unix seconds; 0 until the bounty reaches a terminal state
 };
 
 // Portable reputation. `earned` is the per-DAO Reputation total; `karma` is the
@@ -47,19 +51,20 @@ export type BountyView = Bounty & {
   reputation: Reputation;
 };
 
-// ---- Reward model (native / ERC-20 / ERC-721 / ERC-1155) ----
-export enum RewardType {
+// ---- Assets ----
+// IEscrow.AssetKind — what a reward or a stake is made of. Native and ERC20 are
+// amounts; ERC721 and ERC1155 name a token id, and for those the amount is a
+// quantity rather than a value. The kind is recorded on the bounty, so nothing
+// here is inferred from whether a token address happens to be zero.
+export enum AssetKind {
   Native = 0,
   ERC20 = 1,
   ERC721 = 2,
   ERC1155 = 3,
 }
 
-export type Reward =
-  | { type: RewardType.Native; amount: bigint }
-  | { type: RewardType.ERC20; token: Address; amount: bigint }
-  | { type: RewardType.ERC721; token: Address; tokenId: bigint }
-  | { type: RewardType.ERC1155; token: Address; tokenId: bigint; amount: bigint };
+// One asset — the reward or the stake, read off the same four fields.
+export type Asset = { kind: AssetKind; token: Address; tokenId: bigint; amount: bigint };
 
 // ---- Board lanes (the Dework 4-column board) ----
 export enum Lane {
@@ -123,15 +128,16 @@ export function openToOf(state: number): OpenTo {
   return null;
 }
 
-// A Task is a BountyView enriched with presentation metadata (title, space, skills,
-// lane, reward, open-to). This is what every Dework view renders.
+// A Task is a BountyView enriched with presentation metadata (title, space,
+// skills, lane, open-to). This is what every Dework view renders. The reward and
+// the stake stay where the contract put them — asset.ts reads them off the
+// struct at the render site rather than carrying a second copy that can drift.
 export type Task = BountyView & {
   title: string;
   spaceKey: string;
   skills: string[];
   lane: Lane | null;
   openTo: OpenTo;
-  parsedReward: Reward;
 };
 
 // ---- Activity log (assembled from the bounty event stream, with block ts) ----
@@ -146,6 +152,7 @@ export type ActivityKind =
   | 'resolved'
   | 'cancelled'
   | 'slashed'
+  | 'recovered'
   | 'finalized';
 
 export type Activity = {

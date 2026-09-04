@@ -1,10 +1,9 @@
 import type { Space } from './brands';
 import type { BountyView, Task } from './types';
 import { laneOf, openToOf } from './types';
-import { parseReward } from './reward';
 
-// Enrich on-chain bounties into Dework Tasks: resolve the Space (bounty category),
-// a human title, skills and the reward model. The Space assignment is config-driven
+// Enrich on-chain bounties into Dework Tasks: resolve the Space (bounty
+// category), a human title and skills. The Space assignment is config-driven
 // (Bounty has no on-chain category) — a bounty routes to the first Space whose
 // `match` prefix its issueRef starts with, else the catch-all Space.
 
@@ -47,7 +46,6 @@ export function enrichTask(b: BountyView, spaces: Space[]): Task {
     skills: space?.skills ?? [],
     lane: laneOf(b.state),
     openTo: openToOf(b.state),
-    parsedReward: parseReward(b),
   };
 }
 

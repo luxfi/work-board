@@ -1,8 +1,9 @@
 import { LANES } from '../types';
 import type { Lane, Task } from '../types';
 import { isZero } from '../format';
+import { reward, stake } from '../asset';
 import { openTask } from '../router';
-import { Avatar, SkillTag, RewardBadge, OpenToBadge, IconDoc, IconCircle, IconChevronDown } from '../ui';
+import { Avatar, SkillTag, RewardBadge, StakeBadge, OpenToBadge, IconDoc, IconCircle, IconChevronDown } from '../ui';
 
 function TaskRow({ task }: { task: Task }) {
   const assigned = !isZero(task.worker);
@@ -19,7 +20,10 @@ function TaskRow({ task }: { task: Task }) {
           <SkillTag key={s} skill={s} />
         ))}
       </div>
-      <RewardBadge reward={task.parsedReward} />
+      <RewardBadge reward={reward(task)} />
+      <span className="hidden w-24 justify-end sm:flex">
+        <StakeBadge stake={stake(task)} />
+      </span>
       <div className="w-32 text-right">
         <OpenToBadge openTo={task.openTo} />
       </div>

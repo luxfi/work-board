@@ -1,11 +1,13 @@
 import { LANES, Lane } from '../types';
 import type { LaneDef, Task } from '../types';
 import { isZero } from '../format';
+import { reward, stake } from '../asset';
 import { openTask } from '../router';
 import {
   Avatar,
   SkillTag,
   RewardBadge,
+  StakeBadge,
   OpenToBadge,
   IconDoc,
   IconCircle,
@@ -55,8 +57,9 @@ export function TaskCard({ task }: { task: Task }) {
         </div>
       )}
       <div className="flex items-center justify-between gap-2 pt-0.5">
-        <div className="flex items-center gap-2">
-          <RewardBadge reward={task.parsedReward} />
+        <div className="flex flex-wrap items-center gap-2">
+          <RewardBadge reward={reward(task)} />
+          <StakeBadge stake={stake(task)} />
           <OpenToBadge openTo={task.openTo} />
         </div>
         {assigned && <Avatar addr={task.worker} size={20} />}

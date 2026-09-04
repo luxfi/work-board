@@ -8,17 +8,20 @@ import {
   bountyFinalizedEvent,
   bountyFundedEvent,
   bountyProposedEvent,
+  disputeResolvedEvent,
   karmaAbi,
   nftMetaAbi,
   paymentReleasedEvent,
   reputationAbi,
+  rewardRecoveredEvent,
+  stakeSlashedEvent,
   workAcceptedEvent,
   workSubmittedEvent,
 } from './abi';
 import { ADDRESSES, CHAIN_ID, CHAIN_NAME, NATIVE_SYMBOL, RPC_URL } from './config';
 import { isZero } from './format';
 import type { Activity, Bounty, BountyView, Contributor, OrgStats, Reputation } from './types';
-import type { NftMeta } from './reward';
+import type { NftMeta } from './asset';
 
 // Resolve a root-relative RPC ('/rpc', dev proxy) to an absolute URL for viem/fetch.
 function resolveUrl(u: string): string {
@@ -72,21 +75,25 @@ export async function loadWorkspace(): Promise<Workspace> {
   // The full event stream in one shot — refs, activity, stats, reviewer counts.
   // Each getLogs is inlined (not wrapped) so viem infers the per-event arg types.
   const range = { address: ADDRESSES.bounty, fromBlock: 0n, toBlock: 'latest' } as const;
-  const [proposed, funded, claimed, submitted, accepted, paid, cancelled, disputed, finalized] = await Promise.all([
-    client.getLogs({ ...range, event: bountyProposedEvent }),
-    client.getLogs({ ...range, event: bountyFundedEvent }),
-    client.getLogs({ ...range, event: bountyClaimedEvent }),
-    client.getLogs({ ...range, event: workSubmittedEvent }),
-    client.getLogs({ ...range, event: workAcceptedEvent }),
-    client.getLogs({ ...range, event: paymentReleasedEvent }),
-    client.getLogs({ ...range, event: bountyCancelledEvent }),
-    client.getLogs({ ...range, event: bountyDisputedEvent }),
-    client.getLogs({ ...range, event: bountyFinalizedEvent }),
-  ]);
+  const [proposed, funded, claimed, submitted, accepted, paid, cancelled, disputed, resolved, slashed, recovered, finalized] =
+    await Promise.all([
+      client.getLogs({ ...range, event: bountyProposedEvent }),
+      client.getLogs({ ...range, event: bountyFundedEvent }),
+      client.getLogs({ ...range, event: bountyClaimedEvent }),
+      client.getLogs({ ...range, event: workSubmittedEvent }),
+      client.getLogs({ ...range, event: workAcceptedEvent }),
+      client.getLogs({ ...range, event: paymentReleasedEvent }),
+      client.getLogs({ ...range, event: bountyCancelledEvent }),
+      client.getLogs({ ...range, event: bountyDisputedEvent }),
+      client.getLogs({ ...range, event: disputeResolvedEvent }),
+      client.getLogs({ ...range, event: stakeSlashedEvent }),
+      client.getLogs({ ...range, event: rewardRecoveredEvent }),
+      client.getLogs({ ...range, event: bountyFinalizedEvent }),
+    ]);
 
   // Block timestamps for every event block (deduped, batched).
   const blockNums = new Set<bigint>();
-  for (const group of [proposed, funded, claimed, submitted, accepted, paid, cancelled, disputed, finalized])
+  for (const group of [proposed, funded, claimed, submitted, accepted, paid, cancelled, disputed, resolved, slashed, recovered, finalized])
     for (const l of group) if (l.blockNumber != null) blockNums.add(l.blockNumber);
   const tsByBlock = new Map<bigint, number>();
   await Promise.all(
@@ -152,6 +159,12 @@ export async function loadWorkspace(): Promise<Workspace> {
     activity.push({ bountyId: Number(l.args.bountyId), kind: 'cancelled', actor: l.args.funder!, ts: tsOf(l.blockNumber) });
   for (const l of disputed)
     activity.push({ bountyId: Number(l.args.bountyId), kind: 'disputed', actor: l.args.disputer!, ts: tsOf(l.blockNumber), detail: l.args.reasonRef });
+  for (const l of resolved)
+    activity.push({ bountyId: Number(l.args.bountyId), kind: 'resolved', actor: l.args.arbiter!, ts: tsOf(l.blockNumber), detail: l.args.workerAmount?.toString() });
+  for (const l of slashed)
+    activity.push({ bountyId: Number(l.args.bountyId), kind: 'slashed', actor: l.args.worker!, ts: tsOf(l.blockNumber), detail: l.args.amount?.toString() });
+  for (const l of recovered)
+    activity.push({ bountyId: Number(l.args.bountyId), kind: 'recovered', actor: l.args.funder!, ts: tsOf(l.blockNumber), detail: l.args.amount?.toString() });
   for (const l of finalized)
     activity.push({ bountyId: Number(l.args.bountyId), kind: 'finalized', actor: l.args.worker!, ts: tsOf(l.blockNumber) });
   activity.sort((a, b) => b.ts - a.ts);
