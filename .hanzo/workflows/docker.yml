@@ -37,7 +37,7 @@ jobs:
     # lux-build-amd64: in-cluster ARC scale-set (lux-k8s, amd64 DOKS, DinD).
     # amd64-only — the deploy targets (zoo-k8s, pars-k8s) are amd64; a static SPA
     # needs no arm64.
-    runs-on: [lux-build-linux-amd64]
+    runs-on: [linux-amd64]
     strategy:
       fail-fast: false
       matrix:
